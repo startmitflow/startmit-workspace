@@ -1,0 +1,41 @@
+# Sensitive files
+.env
+*.env
+
+# OpenClaw
+.openclaw/
+.clawhub/
+.herenow/
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+.vercel/
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# QMD (local search index)
+qmd-cli/
+*.db
+*.index
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
