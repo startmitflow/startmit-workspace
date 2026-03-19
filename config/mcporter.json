@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tavily": {
+      "baseUrl": "https://mcp.tavily.com/mcp/?tavilyApiKey=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"
+    },
+    "n8n-bjz": {
+      "baseUrl": "https://n8n.bjzdesign.com/mcp-server/http",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NWQ3YjQyNy0xYmQ3LTQzOTMtYjE3NS04YjhiYzgxODFhOGQiLCJpc3MiOiJuOG4iLCJhdWQiOiJtY3Atc2VydmVyLWFwaSIsImp0aSI6ImQ3NmRlZjg0LTAwNzItNDNjZC05NzQ4LTQ3YzYyNDhlMzExMCIsImlhdCI6MTc3MzczMzQ0Mn0.KMHNlSMrT5g6EVO_WM_ynUdzqHhSHxOm66Ilcblw-ow"
+      }
+    }
+  },
+  "imports": []
+}

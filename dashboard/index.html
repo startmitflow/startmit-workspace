@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>StartMit Agency Co-Pilot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <div class="app-container glass-panel">
+        
+        <nav class="sidebar">
+            <div class="logo-area">
+                <i data-lucide="command" class="logo-icon"></i>
+                <h2>StartMit<span class="subtext">Engine</span></h2>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active"><a href="#fleet"><i data-lucide="server"></i> Agent Fleet</a></li>
+                <li><a href="#content"><i data-lucide="share-2"></i> Content Engine</a></li>
+                <li><a href="#pipeline"><i data-lucide="users"></i> Pipeline</a></li>
+                <li><a href="#analytics"><i data-lucide="bar-chart-2"></i> Analytics</a></li>
+                <li><a href="#chat"><i data-lucide="message-square-terminal"></i> Terminal</a></li>
+            </ul>
+
+            <div class="system-status">
+                <div class="status-indicator" id="gateway-status"></div>
+                <span id="gateway-text">Connecting...</span>
+                <div class="usage-stats">
+                    <p>API: <span class="monospaced" id="api-cost">--</span></p>
+                    <p>Cron: <span class="monospaced" id="cron-count">--</span></p>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-nav">
+                <h1>Command Center</h1>
+                <div class="nav-actions">
+                    <button class="icon-btn" id="refresh-btn" title="Refresh Data">
+                        <i data-lucide="refresh-cw"></i>
+                    </button>
+                    <button class="icon-btn" id="notif-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="badge" id="notif-count" style="display:none">0</span>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Mod&background=1d4ed8&color=fff" alt="User">
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <section id="fleet" class="panel glass-card col-span-2">
+                    <div class="panel-header">
+                        <h3><i data-lucide="activity"></i> Agent Fleet Status</h3>
+                        <span class="refresh-timer" id="fleet-timer">--</span>
+                    </div>
+                    <div class="agent-list" id="agent-list">
+                        <div class="empty-state">
+                            <i data-lucide="loader" class="spin"></i>
+                            <p>Loading agents...</p>
+                        </div>
+                    </div>
+                    <div class="metrics-row" id="fleet-metrics">
+                        <div class="metric">
+                            <span class="label">API Costs (MTD)</span>
+                            <span class="value" id="metric-cost">--</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">Active Jobs</span>
+                            <span class="value" id="metric-jobs">--</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">Pending Reviews</span>
+                            <span class="value" id="metric-pending">--</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="content" class="panel glass-card row-span-2">
+                    <div class="panel-header">
+                        <h3><i data-lucide="newspaper"></i> Content Engine</h3>
+                        <button class="btn btn-sm btn-outline" id="create-content-btn">
+                            <i data-lucide="plus"></i> New
+                        </button>
+                    </div>
+                    
+                    <div class="content-module">
+                        <h4>Approval Queue <span id="queue-count" class="badge-small">0</span></h4>
+                        <div id="approval-queue">
+                            <div class="empty-state small">
+                                <i data-lucide="inbox"></i>
+                                <p>No drafts pending</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-module">
+                        <h4>Scheduled Posts</h4>
+                        <div id="scheduled-posts">
+                            <div class="empty-state small">
+                                <i data-lucide="calendar"></i>
+                                <p>Nothing scheduled</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-module">
+                        <h4>Trending Topics</h4>
+                        <ul class="trend-list" id="trend-list">
+                            <li class="trend-loading">Loading trends...</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="pipeline" class="panel glass-card">
+                    <div class="panel-header">
+                        <h3><i data-lucide="filter"></i> Pipeline</h3>
+                        <button class="icon-btn text-muted" id="pipeline-settings">
+                            <i data-lucide="settings"></i>
+                        </button>
+                    </div>
+                    <div class="pipeline-stats" id="pipeline-stats">
+                        <div class="pipeline-stage">
+                            <span class="stage-name">Leads</span>
+                            <span class="stage-count" id="stage-leads">--</span>
+                        </div>
+                        <div class="pipeline-stage">
+                            <span class="stage-name">Discovery</span>
+                            <span class="stage-count" id="stage-discovery">--</span>
+                        </div>
+                        <div class="pipeline-stage">
+                            <span class="stage-name">Proposal</span>
+                            <span class="stage-count" id="stage-proposal">--</span>
+                        </div>
+                        <div class="pipeline-stage">
+                            <span class="stage-name">Active</span>
+                            <span class="stage-count" id="stage-active">--</span>
+                        </div>
+                    </div>
+                    <div class="lead-feed" id="lead-feed">
+                        <div class="empty-state">
+                            <i data-lucide="users"></i>
+                            <p>No active leads</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="analytics" class="panel glass-card">
+                    <div class="panel-header">
+                        <h3><i data-lucide="bar-chart-2"></i> Analytics</h3>
+                        <select class="time-select" id="analytics-period">
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d">Last 30 days</option>
+                            <option value="90d">Last 90 days</option>
+                        </select>
+                    </div>
+                    <div class="analytics-grid" id="analytics-grid">
+                        <div class="analytics-card">
+                            <span class="label">Website Visits</span>
+                            <span class="value" id="stat-visits">--</span>
+                            <span class="change" id="change-visits">--</span>
+                        </div>
+                        <div class="analytics-card">
+                            <span class="label">Form Submissions</span>
+                            <span class="value" id="stat-forms">--</span>
+                            <span class="change" id="change-forms">--</span>
+                        </div>
+                        <div class="analytics-card">
+                            <span class="label">Conversion Rate</span>
+                            <span class="value" id="stat-conversion">--</span>
+                            <span class="change" id="change-conversion">--</span>
+                        </div>
+                        <div class="analytics-card">
+                            <span class="label">Social Engagement</span>
+                            <span class="value" id="stat-social">--</span>
+                            <span class="change" id="change-social">--</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="chat" class="panel glass-card col-span-2">
+                    <div class="panel-header">
+                        <h3><i data-lucide="terminal"></i> Agent Interface</h3>
+                        <div class="connection-status">
+                            <span class="ping" id="ws-ping"></span>
+                            <span id="ws-status">Disconnected</span>
+                        </div>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-history" id="chat-history">
+                            <div class="message system">
+                                <div class="avatar"><i data-lucide="cpu"></i></div>
+                                <div class="msg-content">
+                                    <p>StartMit OpenClaw system ready. Type a command to begin.</p>
+                                    <p class="hint">Try: "status", "agents", "queue", or "help"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <form id="chat-form">
+                                <input type="text" id="chat-input" placeholder="Enter command..." autocomplete="off">
+                                <button type="submit" class="btn btn-primary icon-btn send-btn">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
