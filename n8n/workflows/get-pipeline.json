@@ -1,0 +1,64 @@
+{
+  "name": "StartMit Dashboard - Get Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "get-pipeline",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "get-pipeline"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return pipeline data with yearnins\nreturn {\n  json: {\n    leads: [\n      {\n        id: \"client-yearnins\",\n        name: \"yearnins\",\n        initials: \"Y\",\n        avatarColor: \"linear-gradient(135deg, #8b5cf6, #ec4899)\",\n        business: \"Apparel Brand\",\n        recommendation: \"Active - Optimization\",\n        steps: [\n          { name: \"Onboarded\", status: \"done\" },\n          { name: \"Supplier Research\", status: \"done\" },\n          { name: \"Inventory System\", status: \"pending\" },\n          { name: \"Order Automation\", status: \"pending\" },\n          { name: \"Email Flows\", status: \"pending\" }\n        ]\n      },\n      {\n        id: \"lead-001\",\n        name: \"Johannes Schmidt\",\n        initials: \"JS\",\n        avatarColor: \"linear-gradient(135deg, #3b82f6, #8b5cf6)\",\n        business: \"Photographer\",\n        recommendation: \"Einzelunternehmen\",\n        steps: [\n          { name: \"CRM Synced\", status: \"done\" },\n          { name: \"Welcome Email\", status: \"done\" },\n          { name: \"Invoice\", status: \"pending\" }\n        ]\n      },\n      {\n        id: \"lead-002\",\n        name: \"Anna Müller\",\n        initials: \"AM\",\n        avatarColor: \"linear-gradient(135deg, #10b981, #3b82f6)\",\n        business: \"Freelance Developer\",\n        recommendation: \"UG (haftungsbeschränkt)\",\n        steps: [\n          { name: \"CRM Synced\", status: \"done\" },\n          { name: \"Welcome Email\", status: \"pending\" },\n          { name: \"Invoice\", status: \"pending\" }\n        ]\n      },\n      {\n        id: \"lead-003\",\n        name: \"Thomas Weber\",\n        initials: \"TW\",\n        avatarColor: \"linear-gradient(135deg, #f59e0b, #ef4444)\",\n        business: \"Consultant\",\n        recommendation: \"GmbH\",\n        steps: [\n          { name: \"CRM Synced\", status: \"done\" },\n          { name: \"Welcome Email\", status: \"done\" },\n          { name: \"Invoice\", status: \"done\" }\n        ]\n      }\n    ],\n    stats: {\n      leads: 8,\n      discovery: 3,\n      proposal: 2,\n      active: 6\n    }\n  }\n};"
+      },
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "startmit-get-pipeline"
+}
