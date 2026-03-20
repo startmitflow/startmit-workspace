@@ -2,6 +2,11 @@
 .env
 *.env
 
+# API tokens and live credentials
+**/n8n-workflows/*-live.json
+**/n8n-workflows/*-token.json
+**/credentials/*.json
+
 # OpenClaw
 .openclaw/
 .clawhub/
@@ -39,3 +44,5 @@ qmd-cli/
 *.tmp
 *.temp
 .cache/
+
+.vercel
