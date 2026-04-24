@@ -7,10 +7,16 @@ app = Flask(__name__)
 
 EDSM_API = "https://www.edsm.net/api-system-v1"
 
+# Add User-Agent to avoid 403
+REQUEST_HEADERS = {
+    "User-Agent": "StartMit-EliteTrader/1.0"
+}
+
 def get_stations(system_name):
     url = f"{EDSM_API}/stations?systemName={urllib.parse.quote(system_name)}"
     try:
-        with urllib.request.urlopen(url, timeout=30) as response:
+        req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+        with urllib.request.urlopen(req, timeout=30) as response:
             return json.loads(response.read().decode())
     except Exception as e:
         return {"error": str(e)}
@@ -18,7 +24,8 @@ def get_stations(system_name):
 def get_market_data(system_name, station_name):
     url = f"{EDSM_API}/stations/market?systemName={urllib.parse.quote(system_name)}&stationName={urllib.parse.quote(station_name)}"
     try:
-        with urllib.request.urlopen(url, timeout=30) as response:
+        req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+        with urllib.request.urlopen(req, timeout=30) as response:
             return json.loads(response.read().decode())
     except Exception as e:
         return {"error": str(e)}
