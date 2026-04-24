@@ -240,6 +240,7 @@ HTML_TEMPLATE = """
         <div class="tabs">
             <button class="tab active" onclick="showTab('trade')">🔍 Trade Search</button>
             <button class="tab" onclick="showTab('station')">🏢 Station Info</button>
+            <button class="tab" onclick="showTab('resources')">🪐 Resources</button>
             <button class="tab" onclick="showTab('colonize')">🏗️ Colony Advisor</button>
             <button class="tab" onclick="showTab('route')">📍 Trade Routes</button>
         </div>
@@ -282,6 +283,37 @@ HTML_TEMPLATE = """
                 </form>
             </div>
             <div id="stationResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- RESOURCES TAB -->
+        <div id="resources" class="tab-content">
+            <div class="info-box">
+                <strong>🪐 System Resource Analyzer</strong><br>
+                Scan a system for celestial bodies and get facility recommendations based on available resources.
+            </div>
+            <div class="search-box">
+                <form id="resourcesForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System Name</label>
+                            <input type="text" id="resSystem" placeholder="e.g. Col 285 Sector HN-R C5-10" oninput="autocompleteSystem(this, 'resSystemList')" required>
+                            <div id="resSystemList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Goal</label>
+                            <select id="resGoal">
+                                <option value="balanced">Balanced</option>
+                                <option value="tech">Tech Focus</option>
+                                <option value="wealth">Wealth Focus</option>
+                                <option value="military">Military Focus</option>
+                                <option value="population">Population Focus</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit">Analyze Resources</button>
+                </form>
+            </div>
+            <div id="resourcesResults" class="results" style="display:none;"></div>
         </div>
 
         <!-- COLONY ADVISOR TAB -->
@@ -545,6 +577,43 @@ HTML_TEMPLATE = """
             } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
         };
 
+        // Resources form
+        document.getElementById('resourcesForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('resSystem').value;
+            const goal = document.getElementById('resGoal').value;
+            const results = document.getElementById('resourcesResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Scanning system bodies...</div>';
+            try {
+                const res = await fetch('/api/resources?system=' + encodeURIComponent(system) + '&goal=' + encodeURIComponent(goal));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<div class="info-box"><h2>🪐 Resource Analysis: ' + data.system + '</h2>';
+                html += '<div class="grid"><div class="stat"><div class="stat-value">' + data.body_count + '</div><div class="stat-label">Bodies</div></div>' +
+                    '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.system_info.economy || 'N/A') + '</div><div class="stat-label">Economy</div></div>' +
+                    '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.system_info.security || 'N/A') + '</div><div class="stat-label">Security</div></div>' +
+                    '<div class="stat"><div class="stat-value">' + (data.system_info.population || 0).toLocaleString() + '</div><div class="stat-label">Population</div></div></div></div>';
+                
+                html += '<h3>Resource Summary</h3><div class="grid">';
+                html += '<div class="stat"><div class="stat-value" style="color:#ffa500;">' + data.resources.minerals.length + '</div><div class="stat-label">Mineral Bodies</div></div>';
+                html += '<div class="stat"><div class="stat-value" style="color:#00d4ff;">' + data.resources.volatiles.length + '</div><div class="stat-label">Volatile Bodies</div></div>';
+                html += '<div class="stat"><div class="stat-value" style="color:#4ecdc4;">' + data.resources.gases.length + '</div><div class="stat-label">Gas Giants</div></div>';
+                html += '<div class="stat"><div class="stat-value" style="color:#ff6b6b;">' + data.resources.rings + '</div><div class="stat-label">Planetary Rings</div></div>';
+                html += '</div>';
+                
+                html += '<h3>Recommended Facilities (Goal: ' + goal + ')</h3>';
+                data.recommendations.forEach((r, i) => {
+                    const color = r.priority === 'High' ? '#00ff00' : r.priority === 'Medium' ? '#ffa500' : '#888';
+                    html += '<div class="facility-card"><h4>' + (i+1) + '. ' + r.facility + ' <span style="color:' + color + ';">[' + r.priority + ']</span></h4>' +
+                        '<div style="margin-bottom:8px;"><span class="stat-change stat-positive">Score: ' + r.score + '</span></div>' +
+                        '<div style="color:#888;">' + r.reasons.join(' • ') + '</div></div>';
+                });
+                
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+
         // Route form
         document.getElementById('routeForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -787,6 +856,156 @@ def api_route():
             "haveShipyard": s.get("haveShipyard", False),
             "haveOutfitting": s.get("haveOutfitting", False),
         } for s in (to_stations.get("stations", []) if not to_stations.get("error") else [])]
+    })
+
+# ===== RESOURCE ANALYZER (New) =====
+
+def fetch_bodies(system_name):
+    """Fetch all celestial bodies in a system."""
+    url = f"{EDSM_API}/api-system-v1/bodies?systemName={urllib.parse.quote(system_name)}"
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read().decode())
+            return data.get("bodies", [])
+    except Exception as e:
+        return []
+
+def analyze_resources(bodies):
+    """Analyze bodies for colonization-relevant resources."""
+    resources = {
+        "minerals": [],
+        "volatiles": [],
+        "organics": [],
+        "gases": [],
+        "asteroid_belts": 0,
+        "rings": 0,
+        "metallic_rings": False,
+        "pristine_rings": False,
+        "terraformable": [],
+    }
+    for body in bodies:
+        btype = body.get("type", "")
+        subtype = body.get("subType", "")
+        name = body.get("name", "Unknown")
+        if body.get("rings"):
+            resources["rings"] += len(body["rings"])
+            for ring in body["rings"]:
+                rtype = ring.get("type", "").lower()
+                if "metallic" in rtype:
+                    resources["metallic_rings"] = True
+                if "pristine" in rtype:
+                    resources["pristine_rings"] = True
+        if body.get("type") == "Belt":
+            resources["asteroid_belts"] += 1
+            continue
+        st = subtype.lower()
+        if "metallic" in st or "metal rich" in st:
+            resources["minerals"].append({"name": name, "type": subtype, "value": "high"})
+        elif "rocky" in st and "body" in st:
+            resources["minerals"].append({"name": name, "type": subtype, "value": "medium"})
+        elif "icy" in st:
+            resources["volatiles"].append({"name": name, "type": subtype, "value": "high"})
+        elif "water world" in st or "water giant" in st:
+            resources["volatiles"].append({"name": name, "type": subtype, "value": "high"})
+        elif "earth-like" in st or "ammonia world" in st:
+            resources["organics"].append({"name": name, "type": subtype, "value": "high"})
+        elif "gas giant" in st:
+            resources["gases"].append({"name": name, "type": subtype, "value": "high"})
+        if body.get("terraformingState") and body["terraformingState"] != "Not terraformable":
+            resources["terraformable"].append(name)
+        elif body.get("isLandable") and body.get("atmosphereType") in ["Thin", "Marginal"]:
+            resources["terraformable"].append(name)
+    return resources
+
+def recommend_by_resources(resources, goal="balanced"):
+    """Recommend facilities based on discovered resources."""
+    scores = {
+        "refinery_hub": 0, "industrial_hub": 0, "high_tech_hub": 0,
+        "agricultural_hub": 0, "extraction_hub": 0, "trading_hub": 0,
+    }
+    reasons = {k: [] for k in scores}
+    if resources["minerals"]:
+        scores["extraction_hub"] += len(resources["minerals"]) * 2
+        scores["industrial_hub"] += len(resources["minerals"])
+        scores["refinery_hub"] += len(resources["minerals"])
+        reasons["extraction_hub"].append(f"{len(resources['minerals'])} mineral-rich bodies")
+        reasons["industrial_hub"].append("Access to raw minerals")
+        reasons["refinery_hub"].append("Metallic/rocky bodies for processing")
+    if resources["metallic_rings"]:
+        scores["extraction_hub"] += 5
+        scores["refinery_hub"] += 3
+        reasons["extraction_hub"].append("Metallic planetary rings detected")
+        reasons["refinery_hub"].append("Metallic rings = high-yield refining")
+    if resources["pristine_rings"]:
+        scores["extraction_hub"] += 3
+        reasons["extraction_hub"].append("Pristine reserves (50% more yield)")
+    if resources["asteroid_belts"] > 0:
+        scores["extraction_hub"] += resources["asteroid_belts"] * 2
+        reasons["extraction_hub"].append(f"{resources['asteroid_belts']} asteroid belts")
+    if resources["volatiles"]:
+        scores["refinery_hub"] += len(resources["volatiles"])
+        scores["industrial_hub"] += len(resources["volatiles"])
+        reasons["refinery_hub"].append(f"{len(resources['volatiles'])} volatile-rich bodies (water, ice)")
+        reasons["industrial_hub"].append("Water/volatiles for industrial processes")
+    if resources["organics"]:
+        scores["agricultural_hub"] += len(resources["organics"]) * 3
+        scores["trading_hub"] += len(resources["organics"])
+        reasons["agricultural_hub"].append(f"{len(resources['organics'])} organic-rich worlds")
+        reasons["trading_hub"].append("Organic goods for trade")
+    if resources["terraformable"]:
+        scores["agricultural_hub"] += len(resources["terraformable"]) * 2
+        scores["high_tech_hub"] += len(resources["terraformable"])
+        reasons["agricultural_hub"].append(f"{len(resources['terraformable'])} terraformable candidate(s)")
+        reasons["high_tech_hub"].append("Terraforming tech development")
+    if resources["gases"]:
+        scores["industrial_hub"] += len(resources["gases"])
+        scores["refinery_hub"] += len(resources["gases"])
+        reasons["industrial_hub"].append("Gas giants for hydrogen/helium")
+        reasons["refinery_hub"].append("Gas extraction potential")
+    scores["trading_hub"] += 2
+    scores["high_tech_hub"] += 1
+    if goal == "tech":
+        scores["high_tech_hub"] += 5; scores["industrial_hub"] += 2
+    elif goal == "wealth":
+        scores["trading_hub"] += 5; scores["refinery_hub"] += 3
+    elif goal == "military":
+        scores["industrial_hub"] += 5; scores["high_tech_hub"] += 2
+    elif goal == "population":
+        scores["agricultural_hub"] += 5; scores["trading_hub"] += 3
+    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return ranked, reasons
+
+@app.route('/api/resources')
+def api_resources():
+    system = request.args.get('system', '')
+    goal = request.args.get('goal', 'balanced')
+    if not system:
+        return jsonify({"error": "System name required"})
+    bodies = fetch_bodies(system)
+    if not bodies:
+        return jsonify({"error": "No body data found for " + system})
+    resources = analyze_resources(bodies)
+    ranked, reasons = recommend_by_resources(resources, goal)
+    system_info = get_system_info(system)
+    info = system_info.get("information", {})
+    return jsonify({
+        "system": system,
+        "body_count": len(bodies),
+        "system_info": {
+            "economy": info.get("economy", ""),
+            "second_economy": info.get("secondEconomy", ""),
+            "population": info.get("population", 0),
+            "security": info.get("security", ""),
+            "allegiance": info.get("allegiance", ""),
+        },
+        "resources": resources,
+        "recommendations": [
+            {"facility": f.replace("_", " ").title(), "score": s,
+             "reasons": reasons.get(f, ["General purpose"]),
+             "priority": "High" if s >= 8 else "Medium" if s >= 4 else "Low"}
+            for f, s in ranked if s > 0
+        ]
     })
 
 if __name__ == '__main__':
