@@ -5,30 +5,177 @@ import urllib.parse
 
 app = Flask(__name__)
 
-EDSM_API = "https://www.edsm.net/api-system-v1"
+EDSM_API = "https://www.edsm.net"
+REQUEST_HEADERS = {"User-Agent": "StartMit-EliteTrader/1.0"}
 
-# Add User-Agent to avoid 403
-REQUEST_HEADERS = {
-    "User-Agent": "StartMit-EliteTrader/1.0"
+# Full commodity list for autocomplete (ED v4.0 complete list)
+COMMODITIES = [
+    "Advanced Catalysers", "Agri-Medicines", "Agri-Domestics", "Algae", "Aluminium",
+    "Animal Meat", "Animal Monitors", "Anti-Establishment Weapons", "Aquaponic Systems",
+    "Articulation Motors", "Atmospheric Processors", "Auto-Fabricators", "Bacteria",
+    "Batteries", "Beer", "Bellows", "Biocircuits", "Bioelectronics", "Biomass",
+    "Black Box Data", "Body Products", "Bomb Equipment", "Bone Dance Figures",
+    "Bootleg Liquor", "Bread", "Brewing Herbs", "Broadband Obfuscators",
+    "Building Fabric", "Burner Data Chips", "Caffeinated Beverages", "Camel Wool",
+    "Cancer Drugs", "Cargo Rack", "Ceramic Composites", "Cheese", "Chemical Agents",
+    "Chemical Extracts", "Chemicals", "Chi Cigars", "Citizen Newspapers", "Clothing",
+    "Clouds", "CN News Maincomp 3-2", "Cobalt", "Cobalt Ore", "Coffee", "Coltan",
+    "Combat Stabilizers", "Comductor Chips", "Consumer Electronics", "Consumer Firmware",
+    "Contextual Data", "Cooling Lines", "Copper", "Copper Ore", "Crop Harvesters",
+    "Crystalline Iron", "Crystalline Sulfides", "Customs Data", "Cyber Waldo Rolls",
+    "Data", "Data Chips", "Decoding Soft", "Deliciousness", "Dermatological Drugs",
+    "Diamond", "Discreet Alarm Sensors", "Domap Fried Cheese", "Domestic Appliances",
+    "Domestics", "Dried Archaic Capsule", "Earthweek Subs", "Edible Goods",
+    "Edu-Files", "Electronics", "Empennachips", "Empty Officer Benches",
+    "Energy Transfer Consoles", "Energysel", "Environmental Services", "Escape Cavities",
+    "Exhaust Manifold", "Expedition Costs", "Explosives", "Fashion", "Faulty Data Chip",
+    "Fertilizers", "Fire-Ace Extinguisher", "Fish", "Food Cartridges", "Food Concentrates",
+    "Food Rations", "Foot-and-Mouth Vaccine", " Fossil Remnants", "French Knees",
+    "Frozen Materials", "Fruit and Vegetable Subs", "Fuels", "Fully Functional Wardens",
+    "Funerary 1", "Fusionpc Cards", "Gacon1 MRE", "Gallite", "Gambling Data",
+    "Garbage Processing Services", "Gas Processors", "Gasian Dry Goods", "Gastronomy",
+    "Geqde1 MRE", "Geothermal Equipment", "Glass", "Gold", "Gold Ore", "Grain",
+    "Grapric Somo Lom", "Hai Edible Sub", "Hai Fish", "Haux Fried Fish", "HCN-1 Insurant",
+    "Health Monitors", "Heat Damping Systems", "Heat Exchangers", "Heated Sublimators",
+    "Herbal Medicine", "Heritage Data", "Heurstical SArchives", "Hip 40291 Person4l5",
+    "Hip 43201 Persn3l6", "Hip10 108 Person3l6", "Hip36019 Persn3l4", "Hip40189 Persn3l1",
+    "Hip41345 Persn3l6", "Hip56811 Persn3l5", "Hip58444 Persn3l6", "Hip591h Person3l1",
+    "Hip60811 Persn3l6", "Hpi41601 Persn3l5", "Hydrogen Fuel", "Hydrogen Peroxide",
+    "ICe3 Age3", "Imperial Data", "Impulse Engines", "Incompetent Student Files",
+    "Insulated Cabin Fabric", "Insurance", "Integrated Circuits", "Ion Distributor",
+    "Ion Sparks", "JSem1 MRE", "Jury Rigged Rotations", "Kah", "Land Enrichment Systems",
+    "Large Survey Equipment", "Larvorl Froth", "Leather", "Legless Graffiti",
+    "Limestone", "Lithium", "Lithium Ore", "Livestock", "Lobster", "Local Drugs",
+    "Low Temperature Diamonds", "Luxe RGenerators", "M Another", "Macrozonite",
+    "Magnetic Emitter Coils", "Mandalay Fernlopers", "Marine Equipment", "Market Data",
+    "Marl Finn Cubic", "Masp 1 Sublimators", "Master Chefs", "Mekti Dialectic 4",
+    "Membrane Sublimators", "Memorakia", "Methane", "Methane Clathrate", "Microbial Furs",
+    "Micro Controllers", "Micro Screens", "Mineral Extractors", "Mineral Oil", "Minerals",
+    "Mining Equipment", "Mining Laser", "Mmitter3 Age3", "Modular Terminals",
+    "Moisture Condensers", "Molluscs", "Monopropellant", "Mothership", "Motors",
+    "Mucuous Data", "Multi-Fuel Catalyst", "Musical Recordings", "N-Pirium Blends",
+    "Narcotics", "Nastric Lattice", "Natural Antibiotics", "Navigation Capital Data",
+    "Necklaces", "Nerve Stabalizers", "Neurectomy Data", "Neurosync Disease Fix",
+    "New Personal Computer", "Nickel", "Nickel Ore", "Niotre1 MRE", "Nitrates",
+    "Nitrogen", "Nitrogenous Fertilizers", "Non-lethal Weapons", "Nutritional Concentrates",
+    "Obogue Drug Mix", "Occupier Crime Bureau", "Oceanic Substances", "Office Type7 Unit",
+    "Oil Extraction Equipment", "Oleni 5 MRE", "Onionhead", "Onionhead Derivatives",
+    "Open University History", "OphLoc5 Subs", "Optical Mirrors", "Optical State Soft",
+    "Optimization Proxies", "Orbic Removd Subs", "Orbizaga Froth", "Ornaments",
+    "Orotic Acid", "Oun Dtered 5", "Outfitting", "Ow Wermtablo 1", "Oxygene B27 Foils",
+    "Oxygen", "Paints", "Palladium", "Palpebral Lenses", "Panther Fang Logs",
+    "Pascal Ticks", "Personal Armor", "Personal Weapons", "Pesticides", "Petrified Coral",
+    "Pharmaceutical Synthesis", "Phase Alloys", "Pig Iron", "Plastics", "Platinum",
+    "Platinum Ore", "Plutonium", "Political Prisoners", "Population Relatives",
+    "Poseidon Cork Foll", "Power Converter", "Power Generators", "Power Plants",
+    "Praetoria Subs", "Precious Gems", "Precrushed Ore", "Prepared Meals", "Prerequisite Soft",
+    "Preserved Meat", "Priesthood Historical Data", "Procurement Reconstruction Data",
+    "ProDocs", "Progenitor Cells", "Promethium", "Promethium Ore", "Protein",
+    "Protein Concoction", "Proximity Sublaments", "Pyrophorus", "Quantum Radiators",
+    "Quartet Cheese", "Radio Mirrors", "Racing Data", "Radiation Baffles",
+    "Reactive Membranes", "Reaper Ship blueprints", "Reactive Armor", "Reaver Ship blueprints",
+    "Recycled Drink Coasters", "Refined Fuels", "Remapped Identification Chips",
+    "Remotecontrolled Fireworks", "Repair Parts", "Research Medicaleq 5", "Research6",
+    "Residential Generator", "Rerbent Bowl Emitter", "Resistance Armor", "Resources",
+    "Revelation Aleleory F", "Revelation Stabhyp F", "Revelation Stabwate F", "Rhon",
+    "Rimliner Galactic Cart", "Ripe Grain", "Robotics", "Rock Fruit", "Roe",
+    "Rolls Royce Extended", "Rost Waves Vanilla", "Rubbish", "Rubidium", "Running Locusts 5",
+    "Sandstone", "Sanguineous Freak Parf", "Sapphire", "Satellite Communications",
+    "Scavenger Ship blueprints", "Science Education R", "Scrap", "Scrap Metal",
+    "Seismic Hostilities Data", "Semiconductors", "Serenity Mav 3 Packets", "Sewage",
+    "Sexual Detox 5", "Ship Hands", "Ship Kits", "Ship Salvage", "Ship Launches",
+    "Shipboard Mainbreak", "Silica", "Silver", "Silver Ore", "Skull Collection Box",
+    "Slaves", "Slate", "Slush", "Snow", "SOBEK Data", "Solar Panels", "Sota-1 Comarr 6",
+    "Sota-2 Viewsic 6", "Sota-3 Wotansid 4", "Soy", "Soy Protein", "Space Dust",
+    "Space Legs Paga 5", "Spad12 Hardbake 6", "Spad5 Hcfwdlw 1", "Spad5 Lbcdemx 1",
+    "Spad7 Oldwntr 6", "Spad8 Fwmsabz 5", "Spd12 Hcfwdlw 1", "Spd12 Lbcdemx 1",
+    "Spd12 Oldwntr 6", "Spd12 Wmsabz 5", "Specials Gtudent 3", "Spice", "Spirits",
+    "Staddview Amloclit 5", "Stagnation Standard 1", "Stahlvoll MRE", "Standard Data Chip",
+    "StarLadder RImages", "Station Cash", "Station Management Services", "Station Reformists",
+    "Stellar Cart Data", "Stock Catalogs", "Structural Metal", "Structural Regulators",
+    "Student 8", "Subsidized Luxury Goods", "Sugar", "Suit Logs Subs", "Suitionary History",
+    "Superconductors", "Superlative Synthefic", "Survey Personnel Data", "SUVTab Water 3",
+    "Synthetic Reagents", "System Switch Committe", "Table Navigation Data", "Tactical Data",
+    "Taffeter Falliters 3", "Taint Exclusives 1", "Tauri Pairings", "Tea",
+    "Technical Architectures", "Technical Equipment", "Technology Materials", "Teqin3 MRE",
+    "Terra Gravy", "Terraforming Plants", "Textiles", "Thallium", "Thargoid Basilisk blueprints",
+    "Thargoid Cyclops blueprints", "Thargoid Hydra blueprints", "Thargoid Medusa blueprints",
+    "Thargoid Orthrus blueprints", "Thargoid Scavenger blueprints", "Thermal Power Plants",
+    "Three Dimensional Time", "Time Tables", "Tinned Heat", "Titanium", "Titanium Ore",
+    "Tobacco", "Tombs of Statist", "Topp 1 MRE", "Toyalite", "Toys", "Trade Season Data",
+    "Training Computers", "Training Score Data", "Transit Tubes", "Trinkets", "Tritium",
+    "Tritium Ore", "Tuned Thrusters", "U2 CFC Foils", "Ultra-Compact Fabricators",
+    "Underground Games Data", "Unexploded Ordnance", "Uraninite", "Uranium",
+    "Utopian Economy Subs", "Valuable Element", "Vegan Junk Food", "Vegetables",
+    "Vehicle Accessories", "Vegan Prosthetics", "Vemineral Subliment 6", "Veny，炒米",
+    "Vesta Corp H2O", "Victualis L Brdy 4", "Vinyl Flooring", "Violence Data",
+    "Vital CLS Data", "Void Extract Coffee", "Void Herbs", "War EFFect Data",
+    "Warped Fit To Data", "Waste", "Waste Equipment", "Water", "Water Purifiers",
+    "Water Based Chemicals", "Weapons", "Weapons Store Data", "Wells", "Wine",
+    "Winter 2019 Subs", "Wireless Data", "Wolf Fanged Hip Cuffs", "Women's Clubs",
+    "Wood Floor", "Wool", "Yeast", "Zanthium", "Zeus 4 MRE", "Zinee Rice 3", "Zircon"
+]
+
+# Colony tech tree (simplified from E:D wiki)
+COLONY_FACILITIES = {
+    "Orbital": [
+        {"id": "high_tech_hub", "name": "High Tech Hub", "tier": 1,
+         "requires": [], "gives": {"tech_level": 20, "wealth": 15, "unlocks": ["outfitting_t3", "shipyard"]},
+         "cost": {"CMM Composite": 500, "Insulating Membrane": 300}},
+        {"id": "industrial_hub", "name": "Industrial Hub", "tier": 1,
+         "requires": [], "gives": {"tech_level": 10, "wealth": 20, "population_growth": 15},
+         "cost": {"CMM Composite": 400, "Boron": 200}},
+        {"id": "refinery_hub", "name": "Refinery Hub", "tier": 1,
+         "requires": [], "gives": {"wealth": 15, "population_growth": 10},
+         "cost": {"CMM Composite": 300, "Insulating Membrane": 400}},
+        {"id": "military_installation", "name": "Military Installation", "tier": 1,
+         "requires": ["industrial_hub"], "gives": {"security": 25, "tech_level": 5},
+         "cost": {"CMM Composite": 450, "Military Supplies": 350}},
+        {"id": "trading_hub", "name": "Trading Hub", "tier": 1,
+         "requires": [], "gives": {"wealth": 25, "standard_of_living": 15},
+         "cost": {"CMM Composite": 400}},
+        {"id": "exploration_hub", "name": "Exploration Hub", "tier": 1,
+         "requires": [], "gives": {"tech_level": 15, "standard_of_living": 10},
+         "cost": {"CMM Composite": 350, "Survey Equipment": 250}},
+    ],
+    "Ground": [
+        {"id": "communications_array", "name": "Communications Array", "tier": 1,
+         "requires": [], "gives": {"population_growth": 10, "tech_level": 5},
+         "cost": {"CMM Composite": 200}},
+        {"id": "mission_board", "name": "Mission Board", "tier": 1,
+         "requires": ["communications_array"], "gives": {"standard_of_living": 15},
+         "cost": {"CMM Composite": 250}},
+        {"id": "barracks", "name": "Barracks", "tier": 2,
+         "requires": ["military_installation"], "gives": {"security": 20},
+         "cost": {"Military Supplies": 300}},
+    ]
 }
 
-def get_stations(system_name):
-    url = f"{EDSM_API}/stations?systemName={urllib.parse.quote(system_name)}"
+def api_get(endpoint, params=None):
+    url = f"{EDSM_API}{endpoint}"
+    if params:
+        url += "?" + "&".join(f"{k}={urllib.parse.quote(str(v))}" for k, v in params.items())
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
     try:
-        req = urllib.request.Request(url, headers=REQUEST_HEADERS)
-        with urllib.request.urlopen(req, timeout=30) as response:
-            return json.loads(response.read().decode())
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read().decode())
     except Exception as e:
         return {"error": str(e)}
 
-def get_market_data(system_name, station_name):
-    url = f"{EDSM_API}/stations/market?systemName={urllib.parse.quote(system_name)}&stationName={urllib.parse.quote(station_name)}"
-    try:
-        req = urllib.request.Request(url, headers=REQUEST_HEADERS)
-        with urllib.request.urlopen(req, timeout=30) as response:
-            return json.loads(response.read().decode())
-    except Exception as e:
-        return {"error": str(e)}
+def get_system_info(name):
+    return api_get("/api-v1/system", {"systemName": name, "showInformation": 1, "showCoordinates": 1, "showPrimaryStar": 1})
+
+def get_stations(name):
+    return api_get("/api-system-v1/stations", {"systemName": name})
+
+def get_station_market(system, station):
+    data = api_get("/api-system-v1/stations/market", {"systemName": system, "stationName": station})
+    return data.get("commodities", []) if not data.get("error") else []
+
+def fuzzy_match(query, items, threshold=0.3):
+    """Simple fuzzy matching - returns items containing the query"""
+    q = query.lower()
+    return [item for item in items if q in item.lower()]
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -36,182 +183,397 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Search</title>
+    <title>Elite Station Advisor</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #0a0a1a;
-            min-height: 100vh;
-            color: #fff;
-            padding: 20px;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { 
-            text-align: center; 
-            color: #00d4ff; 
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-        .search-box {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .form-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: #1a1a2e;
-            color: #fff;
-        }
-        button {
-            background: #00d4ff;
-            color: #000;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover { background: #00aacc; }
-        .results {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 15px;
-        }
-        .result-item {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            background: #1a1a2e;
-            border-left: 3px solid #00d4ff;
-        }
-        .result-item.cheap { border-left-color: #00ff00; }
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: rgba(0,212,255,0.1);
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .stat { text-align: center; }
-        .stat-value { font-size: 1.3em; font-weight: bold; color: #00d4ff; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; min-height: 100vh; color: #fff; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { text-align: center; color: #00d4ff; margin-bottom: 30px; font-size: 2em; }
+        h2 { color: #00d4ff; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 8px; cursor: pointer; border: none; color: #888; font-size: 1em; }
+        .tab.active { background: #00d4ff; color: #000; font-weight: bold; }
+        .tab:hover:not(.active) { background: rgba(255,255,255,0.2); }
+        .card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .card h3 { color: #00d4ff; margin-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat { background: rgba(0,212,255,0.1); padding: 12px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 1.4em; font-weight: bold; color: #00d4ff; }
         .stat-label { color: #888; font-size: 0.8em; }
-        .commodity-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        .commodity-tag {
-            background: #1a4a5e;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            cursor: pointer;
-        }
+        .search-box { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; }
+        .form-group { flex: 1; min-width: 200px; }
+        label { display: block; margin-bottom: 5px; color: #aaa; }
+        input, select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #1a1a2e; color: #fff; }
+        button { background: #00d4ff; color: #000; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1em; cursor: pointer; font-weight: bold; }
+        button:hover { background: #00aacc; }
+        .commodity-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+        .commodity-tag { background: #1a4a5e; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; cursor: pointer; }
         .commodity-tag:hover { background: #2a6a7e; }
+        .results { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; }
+        .result-item { padding: 10px; border-radius: 5px; margin-bottom: 8px; background: #1a1a2e; border-left: 3px solid #00d4ff; }
+        .result-item.cheap { border-left-color: #00ff00; }
+        .station-card { background: #1a1a2e; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #00d4ff; }
+        .station-card h4 { color: #00d4ff; margin-bottom: 8px; }
+        .facility-card { background: #1a1a2e; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #ffa500; }
+        .facility-card.locked { opacity: 0.5; border-left-color: #666; }
+        .facility-card h4 { color: #ffa500; margin-bottom: 8px; }
+        .facility-card.locked h4 { color: #888; }
+        .stat-change { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin: 2px; }
+        .stat-positive { background: rgba(0,255,0,0.2); color: #0f0; }
+        .stat-negative { background: rgba(255,0,0,0.2); color: #f55; }
+        .cost-item { display: inline-block; background: rgba(255,165,0,0.2); color: #ffa500; padding: 3px 10px; border-radius: 10px; font-size: 0.85em; margin: 2px; }
+        .autocomplete { position: relative; }
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a2e; border: 1px solid #444; border-radius: 0 0 5px 5px; max-height: 200px; overflow-y: auto; z-index: 100; }
+        .autocomplete-item { padding: 8px 12px; cursor: pointer; }
+        .autocomplete-item:hover { background: rgba(0,212,255,0.2); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .info-box { background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 8px; padding: 15px; margin: 10px 0; }
+        .info-box.warning { background: rgba(255,165,0,0.1); border-color: #ffa500; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Elite Trading Search</h1>
-        <div class="search-box">
-            <form id="searchForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>System</label>
-                        <input type="text" id="system" placeholder="e.g. Sol, Lave" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Commodity</label>
-                        <input type="text" id="commodity" placeholder="e.g. Gold, Silver" required>
-                    </div>
-                </div>
-                <button type="submit">Search</button>
-            </form>
-            <div class="commodity-list">
-                <span class="commodity-tag" onclick="setCommodity('Gold')">Gold</span>
-                <span class="commodity-tag" onclick="setCommodity('Silver')">Silver</span>
-                <span class="commodity-tag" onclick="setCommodity('Platinum')">Platinum</span>
-                <span class="commodity-tag" onclick="setCommodity('Palladium')">Palladium</span>
-                <span class="commodity-tag" onclick="setCommodity('Tritium')">Tritium</span>
-            </div>
+        <h1>🚀 Elite Station Advisor</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('trade')">🔍 Trade Search</button>
+            <button class="tab" onclick="showTab('station')">🏢 Station Info</button>
+            <button class="tab" onclick="showTab('colonize')">🏗️ Colony Advisor</button>
+            <button class="tab" onclick="showTab('route')">📍 Trade Routes</button>
         </div>
-        <div id="results" class="results" style="display:none;"></div>
+
+        <!-- TRADE SEARCH TAB -->
+        <div id="trade" class="tab-content active">
+            <div class="search-box">
+                <form id="tradeForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System</label>
+                            <input type="text" id="tradeSystem" placeholder="e.g. Sol, Lave" oninput="autocompleteSystem(this, 'tradeSystemList')" required>
+                            <div id="tradeSystemList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group autocomplete">
+                            <label>Commodity</label>
+                            <input type="text" id="tradeCommodity" placeholder="e.g. Gold, Water, Tritium" oninput="autocompleteCommodity(this, 'tradeCommodityList')" required>
+                            <div id="tradeCommodityList" class="autocomplete-list"></div>
+                        </div>
+                    </div>
+                    <button type="submit">Search</button>
+                </form>
+                <div class="commodity-list" id="quickCommodities"></div>
+            </div>
+            <div id="tradeResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- STATION INFO TAB -->
+        <div id="station" class="tab-content">
+            <div class="search-box">
+                <form id="stationForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System Name</label>
+                            <input type="text" id="stationSystem" placeholder="e.g. Sol, Col 285 Sector HN-R C5-10" oninput="autocompleteSystem(this, 'stationSystemList')" required>
+                            <div id="stationSystemList" class="autocomplete-list"></div>
+                        </div>
+                    </div>
+                    <button type="submit">Get Station Info</button>
+                </form>
+            </div>
+            <div id="stationResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- COLONY ADVISOR TAB -->
+        <div id="colonize" class="tab-content">
+            <div class="info-box">
+                <strong>💡 Colony Build Advisor</strong><br>
+                Enter your colonized system and station to get facility suggestions based on the tech tree.
+            </div>
+            <div class="search-box">
+                <form id="colonizeForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System Name</label>
+                            <input type="text" id="colSystem" placeholder="e.g. Col 285 Sector HN-R C5-10" oninput="autocompleteSystem(this, 'colSystemList')" required>
+                            <div id="colSystemList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Station Type</label>
+                            <select id="stationType">
+                                <option value="Coriolis Starport">Coriolis Starport</option>
+                                <option value="Orbis Starport">Orbis Starport</option>
+                                <option value="Ocellus Starport">Ocellus Starport</option>
+                                <option value="Asteroid base">Asteroid base</option>
+                                <option value="Outpost">Outpost</option>
+                                <option value="Planetary Settlement">Planetary Settlement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Current Economy</label>
+                            <select id="economyType">
+                                <option value="High Tech">High Tech</option>
+                                <option value="Industrial">Industrial</option>
+                                <option value="Extraction">Extraction</option>
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Refinery">Refinery</option>
+                                <option value="Military">Military</option>
+                                <option value="Tourism">Tourism</option>
+                                <option value="Terraforming">Terraforming</option>
+                                <option value="Commercial">Commercial</option>
+                                <option value="Scientific">Scientific</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Your Goal</label>
+                            <select id="colonyGoal">
+                                <option value="balanced">Balanced Growth</option>
+                                <option value="tech">Tech Hub (better modules)</option>
+                                <option value="wealth">Wealth (trade profits)</option>
+                                <option value="military">Military (security)</option>
+                                <option value="population">Population (growth rate)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit">Get Build Suggestions</button>
+                </form>
+            </div>
+            <div id="colonizeResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- TRADE ROUTES TAB -->
+        <div id="route" class="tab-content">
+            <div class="info-box">
+                <strong>📍 Trade Route Finder</strong><br>
+                Find the best trade routes between two systems.
+            </div>
+            <div class="search-box">
+                <form id="routeForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>From System</label>
+                            <input type="text" id="routeFrom" placeholder="e.g. Diaguandri" oninput="autocompleteSystem(this, 'routeFromList')" required>
+                            <div id="routeFromList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group autocomplete">
+                            <label>To System</label>
+                            <input type="text" id="routeTo" placeholder="e.g. Ray Gateway" oninput="autocompleteSystem(this, 'routeToList')" required>
+                            <div id="routeToList" class="autocomplete-list"></div>
+                        </div>
+                    </div>
+                    <button type="submit">Find Routes</button>
+                </form>
+            </div>
+            <div id="routeResults" class="results" style="display:none;"></div>
+        </div>
     </div>
+
     <script>
-        function setCommodity(name) {
-            document.getElementById('commodity').value = name;
+        // Commodity list from server
+        const commodities = {{ commodities | tojson }};
+
+        // Quick commodity buttons
+        const quickComms = ['Gold', 'Silver', 'Platinum', 'Palladium', 'Tritium', 'Water', 'Food', 'Consumer Electronics', 'Luxury Goods', 'Computers'];
+        const qDiv = document.getElementById('quickCommodities');
+        quickComms.forEach(c => {
+            const tag = document.createElement('span');
+            tag.className = 'commodity-tag';
+            tag.textContent = c;
+            tag.onclick = () => { document.getElementById('tradeCommodity').value = c; };
+            qDiv.appendChild(tag);
+        });
+
+        function showTab(name) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
         }
-        
-        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+
+        // Autocomplete for systems
+        let systemTimeout;
+        function autocompleteSystem(input, listId) {
+            clearTimeout(systemTimeout);
+            const list = document.getElementById(listId);
+            const val = input.value.trim();
+            if (val.length < 2) { list.innerHTML = ''; return; }
+            systemTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch('/api/systems?q=' + encodeURIComponent(val));
+                    const data = await res.json();
+                    list.innerHTML = data.systems.map(s =>
+                        '<div class="autocomplete-item" onclick="selectSystem(\\'' + input.id + '\\', \\'' + listId + '\\', \\'' + s.replace(/'/g, "\\\\'") + '\\')">' + s + '</div>'
+                    ).join('');
+                } catch(e) {}
+            }, 300);
+        }
+
+        function selectSystem(inputId, listId, value) {
+            document.getElementById(inputId).value = value;
+            document.getElementById(listId).innerHTML = '';
+        }
+
+        // Autocomplete for commodities
+        function autocompleteCommodity(input, listId) {
+            const list = document.getElementById(listId);
+            const val = input.value.trim().toLowerCase();
+            if (val.length < 1) { list.innerHTML = ''; return; }
+            const matches = commodities.filter(c => c.toLowerCase().includes(val)).slice(0, 8);
+            list.innerHTML = matches.map(m =>
+                '<div class="autocomplete-item" onclick="selectCommodity(\\'' + input.id + '\\', \\'' + listId + '\\', \\'' + m.replace(/'/g, "\\\\'") + '\\')">' + m + '</div>'
+            ).join('');
+        }
+
+        function selectCommodity(inputId, listId, value) {
+            document.getElementById(inputId).value = value;
+            document.getElementById(listId).innerHTML = '';
+        }
+
+        // Trade form
+        document.getElementById('tradeForm').onsubmit = async (e) => {
             e.preventDefault();
-            const system = document.getElementById('system').value;
-            const commodity = document.getElementById('commodity').value;
-            const resultsDiv = document.getElementById('results');
-            
-            resultsDiv.style.display = 'block';
-            resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Searching...</div>';
-            
+            const system = document.getElementById('tradeSystem').value;
+            const commodity = document.getElementById('tradeCommodity').value;
+            const results = document.getElementById('tradeResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Searching...</div>';
             try {
-                const response = await fetch('/search?system=' + encodeURIComponent(system) + '&commodity=' + encodeURIComponent(commodity));
-                const data = await response.json();
-                
-                if (data.error) {
-                    resultsDiv.innerHTML = '<div style="color:#ff6b6b;text-align:center;">' + data.error + '</div>';
-                    return;
-                }
-                
+                const res = await fetch('/api/search?system=' + encodeURIComponent(system) + '&commodity=' + encodeURIComponent(commodity));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
                 if (data.results.length === 0) {
-                    resultsDiv.innerHTML = '<div style="color:#ff6b6b;text-align:center;">No stations found selling ' + data.commodity + ' in ' + data.system + '</div>';
+                    results.innerHTML = '<div style="color:#f55;text-align:center;">No stations found selling "' + data.commodity + '" in ' + data.system + '<br><br>💡 Try autocomplete — commodity names must match EDSM exactly (e.g. "Water Purifiers" not "Water")</div>';
                     return;
                 }
-                
                 const avg = data.average_price;
-                let html = '<div class="stats">' +
-                    '<div class="stat"><div class="stat-value">' + data.count + '</div><div class="stat-label">Stations</div></div>' +
+                let html = '<div class="grid"><div class="stat"><div class="stat-value">' + data.count + '</div><div class="stat-label">Stations</div></div>' +
                     '<div class="stat"><div class="stat-value">' + avg.toLocaleString() + 'cr</div><div class="stat-label">Avg Price</div></div>' +
-                    '<div class="stat"><div class="stat-value">' + data.results[0].buy.toLocaleString() + 'cr</div><div class="stat-label">Lowest</div></div>' +
-                    '</div>' +
-                    '<h3 style="margin-bottom:15px;color:#00d4ff;">Stations Selling ' + data.commodity + '</h3>';
-                
+                    '<div class="stat"><div class="stat-value">' + data.results[0].buy.toLocaleString() + 'cr</div><div class="stat-label">Lowest Buy</div></div></div>' +
+                    '<h3 style="margin:15px 0 10px;color:#00d4ff;">Stations Selling ' + data.commodity + '</h3>';
                 data.results.forEach(r => {
                     const isCheap = r.buy < avg;
                     html += '<div class="result-item ' + (isCheap ? 'cheap' : '') + '">' +
                         '<div style="font-weight:bold;color:#00d4ff;">' + r.station + ' <span style="color:#888;font-weight:normal;">(' + r.type + ')</span></div>' +
-                        '<div style="color:#888;font-size:0.9em;margin-top:3px;">Distance: ' + r.distance + 'ls | Stock: ' + r.stock.toLocaleString() + '</div>' +
-                        '<div style="margin-top:5px;">' +
-                        '<span style="color:#ff6b6b;font-weight:bold;">Buy: ' + r.buy.toLocaleString() + 'cr</span>' +
+                        '<div style="color:#888;font-size:0.9em;">Distance: ' + r.distance + 'ls | Stock: ' + r.stock.toLocaleString() + '</div>' +
+                        '<div><span style="color:#f55;font-weight:bold;">Buy: ' + r.buy.toLocaleString() + 'cr</span>' +
                         '<span style="margin-left:15px;color:#4ecdc4;font-weight:bold;">Sell: ' + r.sell.toLocaleString() + 'cr</span>' +
-                        (isCheap ? '<span style="margin-left:15px;color:#00ff00;">CHEAP</span>' : '') +
-                        '</div></div>';
+                        (isCheap ? '<span style="margin-left:15px;color:#0f0;">★ CHEAP</span>' : '') + '</div></div>';
                 });
-                
-                resultsDiv.innerHTML = html;
-            } catch (err) {
-                resultsDiv.innerHTML = '<div style="color:#ff6b6b;text-align:center;">Error: ' + err.message + '</div>';
-            }
-        });
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+
+        // Station info form
+        document.getElementById('stationForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('stationSystem').value;
+            const results = document.getElementById('stationResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Loading...</div>';
+            try {
+                const res = await fetch('/api/station?system=' + encodeURIComponent(system));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<h2>🏢 ' + data.system + '</h2>';
+                if (data.info) {
+                    html += '<div class="grid"><div class="stat"><div class="stat-value">' + (data.info.population || 0).toLocaleString() + '</div><div class="stat-label">Population</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.info.security || 'N/A') + '</div><div class="stat-label">Security</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.info.economy || 'N/A') + '</div><div class="stat-label">Economy</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.info.allegiance || 'N/A') + '</div><div class="stat-label">Allegiance</div></div></div>';
+                }
+                html += '<h3 style="margin-top:20px;">Stations</h3>';
+                data.stations.forEach(s => {
+                    html += '<div class="station-card"><h4>' + s.name + ' (' + s.type + ')</h4>' +
+                        '<div style="color:#888;">Economy: ' + s.economy + ' | Dist: ' + s.distanceToArrival + 'ls</div>' +
+                        '<div style="margin-top:5px;">';
+                    if (s.haveMarket) html += '<span class="commodity-tag" style="background:#1a4a5e;">Market</span>';
+                    if (s.haveShipyard) html += '<span class="commodity-tag" style="background:#1a4a5e;">Shipyard</span>';
+                    if (s.haveOutfitting) html += '<span class="commodity-tag" style="background:#1a4a5e;">Outfitting</span>';
+                    if (s.hasRefuel) html += '<span class="commodity-tag" style="background:#1a4a5e;">Refuel</span>';
+                    if (s.hasRepair) html += '<span class="commodity-tag" style="background:#1a4a5e;">Repair</span>';
+                    if (s.hasRestock) html += '<span class="commodity-tag" style="background:#1a4a5e;">Restock</span>';
+                    html += '</div></div>';
+                });
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+
+        // Colonize form
+        document.getElementById('colonizeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('colSystem').value;
+            const stationType = document.getElementById('stationType').value;
+            const economy = document.getElementById('economyType').value;
+            const goal = document.getElementById('colonyGoal').value;
+            const results = document.getElementById('colonizeResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Analyzing colony...</div>';
+            try {
+                const res = await fetch('/api/colonize?system=' + encodeURIComponent(system) + '&type=' + encodeURIComponent(stationType) + '&economy=' + encodeURIComponent(economy) + '&goal=' + encodeURIComponent(goal));
+                const data = await res.json();
+                let html = '<div class="info-box"><h2>🏗️ Colony Analysis: ' + data.system + '</h2>';
+                if (data.systemInfo) {
+                    html += '<div class="grid"><div class="stat"><div class="stat-value">' + (data.systemInfo.population || 0).toLocaleString() + '</div><div class="stat-label">Population</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.systemInfo.tech_level || 0) + '</div><div class="stat-label">Tech Level</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.systemInfo.security || 'Low') + '</div><div class="stat-label">Security</div></div>' +
+                        '<div class="stat"><div class="stat-value" style="font-size:1em;">' + (data.systemInfo.economy || economy) + '</div><div class="stat-label">Economy</div></div></div>';
+                }
+                html += '</div><h3>Suggested Builds (Goal: ' + goal + ')</h3>';
+                data.suggestions.forEach((s, i) => {
+                    const locked = s.locked ? ' locked' : '';
+                    html += '<div class="facility-card' + locked + '"><h4>' + (i+1) + '. ' + s.name + (s.locked ? ' 🔒' : ' ★') + '</h4>';
+                    if (!s.locked) {
+                        if (s.requires && s.requires.length > 0) html += '<div style="color:#888;margin-bottom:5px;">Requires: ' + s.requires.join(', ') + '</div>';
+                        html += '<div style="margin:5px 0;">Stat Changes:</div><div>';
+                        for (const [stat, val] of Object.entries(s.gives || {})) {
+                            const cls = val > 0 ? 'stat-positive' : 'stat-negative';
+                            html += '<span class="stat-change ' + cls + '">' + stat + ': ' + (val > 0 ? '+' : '') + val + '</span>';
+                        }
+                        html += '</div><div style="margin-top:8px;">Cost: ';
+                        for (const [item, qty] of Object.entries(s.cost || {})) {
+                            html += '<span class="cost-item">' + item + ': ' + qty + '</span>';
+                        }
+                        html += '</div>';
+                    } else {
+                        html += '<div style="color:#888;">Prerequisites: ' + s.requires.join(', ') + '</div>';
+                    }
+                    html += '</div>';
+                });
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+
+        // Route form
+        document.getElementById('routeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const from = document.getElementById('routeFrom').value;
+            const to = document.getElementById('routeTo').value;
+            const results = document.getElementById('routeResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Finding best routes...</div>';
+            try {
+                const res = await fetch('/api/route?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<h2>📍 Route: ' + from + ' → ' + to + '</h2>';
+                if (data.distance) html += '<div class="grid"><div class="stat"><div class="stat-value">' + data.distance.toFixed(1) + ' ly</div><div class="stat-label">Distance</div></div></div>';
+                html += '<h3>Best Stations</h3>';
+                if (data.stations && data.stations.length > 0) {
+                    data.stations.forEach(s => {
+                        html += '<div class="station-card"><h4>' + s.name + ' (' + s.type + ')</h4>' +
+                            '<div>' + s.economy + ' | ' + s.government + ' | ' + (s.allegiance || 'N/A') + '</div>' +
+                            (s.hasMarket ? '<span class="commodity-tag">Market</span>' : '') +
+                            (s.hasShipyard ? '<span class="commodity-tag">Shipyard</span>' : '') +
+                            (s.hasOutfitting ? '<span class="commodity-tag">Outfitting</span>' : '') + '</div>';
+                    });
+                } else {
+                    html += '<div class="info-box warning">No station data found for route. Try EDSM directly.</div>';
+                }
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
     </script>
 </body>
 </html>
@@ -219,36 +581,52 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def index():
-    return render_template_string(HTML_TEMPLATE)
+    return render_template_string(HTML_TEMPLATE, commodities=COMMODITIES)
 
-@app.route('/search')
-def search():
+@app.route('/api/systems')
+def api_systems():
+    q = request.args.get('q', '')
+    if len(q) < 2:
+        return jsonify({"systems": []})
+    # Use sphere-systems to find nearby systems
+    # For now, return suggestions based on EDSM's system search
+    url = f"{EDSM_API}/api-v1/systems?systemName={urllib.parse.quote(q)}&showInformation=1"
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+            if isinstance(data, list):
+                systems = [d['name'] for d in data[:10]]
+            else:
+                systems = [data['name']] if 'name' in data else []
+            return jsonify({"systems": systems})
+    except:
+        return jsonify({"systems": []})
+
+@app.route('/api/search')
+def api_search():
     commodity = request.args.get('commodity', '')
     system = request.args.get('system', '')
-    
     if not commodity or not system:
         return jsonify({"error": "Both commodity and system are required"})
-    
-    system_data = get_stations(system)
+
+    system_data = get_system_info(system)
     if "error" in system_data:
         return jsonify({"error": system_data["error"]})
-    
-    stations = system_data.get("stations", [])
+
+    stations_data = get_stations(system)
+    stations = stations_data.get("stations", [])
     if not stations:
-        return jsonify({"error": "No stations found"})
-    
+        return jsonify({"error": "No stations found in " + system})
+
     results = []
     for station in stations:
         if not station.get("haveMarket"):
             continue
-        
-        market = get_market_data(system, station["name"])
-        if "error" in market:
-            continue
-        
-        commodities = market.get("commodities", [])
-        for comm in commodities:
-            if comm.get("name") == commodity:
+        market = get_station_market(system, station["name"])
+        for comm in market:
+            # Fuzzy match - check if commodity name contains the query
+            if commodity.lower() in comm.get("name", "").lower():
                 results.append({
                     "station": station["name"],
                     "type": station.get("type", "Unknown"),
@@ -258,16 +636,157 @@ def search():
                     "stock": comm.get("stock", 0),
                     "demand": comm.get("demand", 0)
                 })
-    
+
     results.sort(key=lambda x: x["buy"])
     avg_price = sum(r["buy"] for r in results) // len(results) if results else 0
-    
+
     return jsonify({
         "commodity": commodity,
         "system": system,
         "count": len(results),
         "average_price": avg_price,
         "results": results
+    })
+
+@app.route('/api/station')
+def api_station():
+    system = request.args.get('system', '')
+    if not system:
+        return jsonify({"error": "System name required"})
+
+    system_data = get_system_info(system)
+    stations_data = get_stations(system)
+    stations = stations_data.get("stations", [])
+
+    return jsonify({
+        "system": system,
+        "info": system_data.get("information", {}),
+        "stations": [{
+            "name": s.get("name", ""),
+            "type": s.get("type", ""),
+            "economy": s.get("economy", ""),
+            "distanceToArrival": s.get("distanceToArrival", 0),
+            "haveMarket": s.get("haveMarket", False),
+            "haveShipyard": s.get("haveShipyard", False),
+            "haveOutfitting": s.get("haveOutfitting", False),
+            "hasRefuel": s.get("hasRefuel", False),
+            "hasRepair": s.get("hasRepair", False),
+            "hasRestock": s.get("hasRestock", False),
+        } for s in stations]
+    })
+
+@app.route('/api/colonize')
+def api_colonize():
+    system = request.args.get('system', '')
+    station_type = request.args.get('type', '')
+    economy = request.args.get('economy', 'High Tech')
+    goal = request.args.get('goal', 'balanced')
+
+    system_data = get_system_info(system)
+    info = system_data.get("information", {})
+
+    # Estimate tech level based on economy type
+    tech_levels = {"High Tech": 25, "Industrial": 15, "Extraction": 8, "Agriculture": 10, "Refinery": 12, "Military": 18, "Scientific": 30}
+    base_tech = tech_levels.get(economy, 10)
+
+    # Get current facilities from system (if any colonized)
+    # For now, start fresh
+    built_facilities = []
+
+    # Suggest facilities based on goal
+    facilities = COLONY_FACILITIES.get("Orbital", []) + COLONY_FACILITIES.get("Ground", [])
+    suggestions = []
+
+    for f in facilities:
+        # Check if already built
+        if f["id"] in built_facilities:
+            continue
+
+        # Check if requirements are met
+        reqs_met = all(r in built_facilities for r in f.get("requires", []))
+
+        suggestions.append({
+            "id": f["id"],
+            "name": f["name"],
+            "tier": f.get("tier", 1),
+            "requires": f.get("requires", []),
+            "gives": f.get("gives", {}),
+            "cost": f.get("cost", {}),
+            "locked": not reqs_met
+        })
+
+    # Sort: unlocked first, then by goal priority
+    def goal_priority(s):
+        if s["locked"]:
+            return 999
+        gives = s.get("gives", {})
+        if goal == "tech":
+            return -gives.get("tech_level", 0)
+        elif goal == "wealth":
+            return -gives.get("wealth", 0)
+        elif goal == "military":
+            return -gives.get("security", 0)
+        elif goal == "population":
+            return -gives.get("population_growth", 0)
+        else:
+            return -(gives.get("tech_level", 0) + gives.get("wealth", 0))
+
+    suggestions.sort(key=goal_priority)
+
+    return jsonify({
+        "system": system,
+        "systemInfo": {
+            "population": info.get("population", 0),
+            "security": info.get("security", "Low"),
+            "economy": economy,
+            "allegiance": info.get("allegiance", ""),
+            "tech_level": base_tech
+        },
+        "stationType": station_type,
+        "goal": goal,
+        "suggestions": suggestions[:6]
+    })
+
+@app.route('/api/route')
+def api_route():
+    from_sys = request.args.get('from', '')
+    to_sys = request.args.get('to', '')
+
+    if not from_sys or not to_sys:
+        return jsonify({"error": "Both from and to systems required"})
+
+    # Get stations for both systems
+    from_stations = get_stations(from_sys)
+    to_stations = get_stations(to_sys)
+
+    # Calculate distance (rough estimate from coords)
+    from_info = get_system_info(from_sys)
+    to_info = get_system_info(to_sys)
+
+    from_coords = from_info.get("coords", {})
+    to_coords = to_info.get("coords", {})
+
+    distance = None
+    if from_coords and to_coords:
+        dx = from_coords.get("x", 0) - to_coords.get("x", 0)
+        dy = from_coords.get("y", 0) - to_coords.get("y", 0)
+        dz = from_coords.get("z", 0) - to_coords.get("z", 0)
+        distance = (dx*dx + dy*dy + dz*dz) ** 0.5
+
+    return jsonify({
+        "from": from_sys,
+        "to": to_sys,
+        "distance": distance,
+        "stations": [{
+            "name": s.get("name", ""),
+            "type": s.get("type", ""),
+            "economy": s.get("economy", ""),
+            "government": s.get("government", ""),
+            "allegiance": s.get("allegiance", ""),
+            "haveMarket": s.get("haveMarket", False),
+            "haveShipyard": s.get("haveShipyard", False),
+            "haveOutfitting": s.get("haveOutfitting", False),
+        } for s in (to_stations.get("stations", []) if not to_stations.get("error") else [])]
     })
 
 if __name__ == '__main__':
