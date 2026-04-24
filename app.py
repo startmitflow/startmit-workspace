@@ -1099,36 +1099,60 @@ HTML_TEMPLATE = """
         <p>Connect your Inara.cz account for personalized data</p>
     </div>
     <div class="card">
+        <div class="card-header"><span class="card-title">API Configuration</span></div>
         <div class="form-grid">
             <div class="form-group">
                 <label>Inara API Key</label>
                 <input type="password" id="inara-key" placeholder="Your Inara API key">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
-                <button onclick="saveInaraKey()">Save & Connect</button>
+                <button onclick="saveInaraKey()">💾 Save Key</button>
             </div>
         </div>
         <p style="color:var(--text-dim);font-size:0.8em;margin-top:10px;">
             Get your API key from <span style="color:var(--cyan);">inara.cz</span> → Settings → API Key
         </p>
     </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Sync Commander Data</span></div>
+        <div style="margin-bottom:15px;">
+            <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Fetch your commander profile, ranks, ships, and materials directly from Inara.cz. Make sure your CMDR name matches exactly.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <input type="text" id="inara-cmdr" placeholder="CMDR Name (must match Inara)">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end;">
+                    <button onclick="syncInara()">🔄 Sync from Inara</button>
+                </div>
+            </div>
+        </div>
+        <div id="inara-sync-status" class="results-grid" style="display:none;"></div>
+    </div>
+    
     <div id="inara-profile" class="card" style="display:none;">
         <div class="card-header">
-            <span class="card-title">Commander Profile</span>
+            <span class="card-title">Synced Commander Data</span>
+            <button class="secondary" onclick="applyToDashboard()">📥 Import to Dashboard</button>
         </div>
         <div id="inara-data"></div>
     </div>
+    
     <div class="card">
-        <div class="card-header"><span class="card-title">Inara API Features</span></div>
+        <div class="card-header"><span class="card-title">What Gets Imported</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;">
-            <span class="service-badge green">Commander Stats</span>
-            <span class="service-badge green">Material Inventory</span>
-            <span class="service-badge green">Ship Loadouts</span>
-            <span class="service-badge green">Community Goals</span>
-            <span class="service-badge green">Reputation</span>
+            <span class="service-badge green">✅ Commander Name</span>
+            <span class="service-badge green">✅ Combat Rank</span>
+            <span class="service-badge green">✅ Trade Rank</span>
+            <span class="service-badge green">✅ Exploration Rank</span>
+            <span class="service-badge green">✅ Credits</span>
+            <span class="service-badge green">✅ Material Inventory</span>
+            <span class="service-badge orange">⚠️ Ship Loadouts (partial)</span>
+            <span class="service-badge orange">⚠️ Community Goals</span>
+            <span class="service-badge orange">⚠️ Reputation (partial)</span>
         </div>
         <p style="color:var(--text-dim);font-size:0.85em;">
-            Inara API requires user authentication. Without an API key, some features will show placeholder data.
+            Data is fetched directly from Inara's servers. Some fields may not be available depending on your Inara privacy settings.
         </p>
     </div>
 </div>
@@ -1204,6 +1228,19 @@ HTML_TEMPLATE = """
             <button class="secondary" onclick="quickAction('nearest-material-trader')">🔄 Material Trader</button>
             <button class="secondary" onclick="quickAction('nearest-tech-broker')">⚙️ Tech Broker</button>
         </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Data Backup & Restore</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <button class="secondary" onclick="exportData()">📤 Export All Data</button>
+            <button class="secondary" onclick="document.getElementById('import-file').click()">📥 Import Data</button>
+            <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+            <button class="secondary" onclick="clearAllData()" style="border-color:var(--red);color:var(--red);">🗑️ Clear All</button>
+        </div>
+        <p style="color:var(--text-dim);font-size:0.8em;margin-top:10px;">
+            Export your commander profile, colonies, ships, materials, and bookmarks to a JSON file. Keep it safe — this is your progress backup.
+        </p>
     </div>
     
     <div class="card">
@@ -2419,32 +2456,228 @@ function deleteBookmark(index) {
     logActivity(`Bookmark removed: ${name}`);
 }
 
+// ===== DATA EXPORT/IMPORT =====
+function exportData() {
+    const data = {
+        cmdr: JSON.parse(localStorage.getItem('elite_cmdr') || '{}'),
+        colonies: JSON.parse(localStorage.getItem('elite_colonies') || '[]'),
+        ships: JSON.parse(localStorage.getItem('elite_ships') || '[]'),
+        materials: JSON.parse(localStorage.getItem('elite_materials') || '[]'),
+        bookmarks: JSON.parse(localStorage.getItem('elite_bookmarks') || '[]'),
+        activity: JSON.parse(localStorage.getItem('elite_activity') || '[]'),
+        inara_api_key: localStorage.getItem('inara_api_key') || '',
+        exported: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `elite-companion-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    logActivity('Data exported to file');
+    alert('✅ Data exported! Save this file somewhere safe.');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            // Validate
+            if (!data.exported) {
+                alert('Invalid backup file');
+                return;
+            }
+            
+            // Import
+            if (data.cmdr) localStorage.setItem('elite_cmdr', JSON.stringify(data.cmdr));
+            if (data.colonies) localStorage.setItem('elite_colonies', JSON.stringify(data.colonies));
+            if (data.ships) localStorage.setItem('elite_ships', JSON.stringify(data.ships));
+            if (data.materials) localStorage.setItem('elite_materials', JSON.stringify(data.materials));
+            if (data.bookmarks) localStorage.setItem('elite_bookmarks', JSON.stringify(data.bookmarks));
+            if (data.activity) localStorage.setItem('elite_activity', JSON.stringify(data.activity));
+            if (data.inara_api_key) localStorage.setItem('inara_api_key', data.inara_api_key);
+            
+            // Refresh UI
+            displayCommander();
+            renderColonies();
+            renderShips();
+            renderMaterials('all');
+            renderShoppingList();
+            renderBookmarks('all');
+            renderActivity();
+            
+            logActivity('Data imported from file');
+            alert(`✅ Data imported from ${data.exported.split('T')[0]}!`);
+        } catch (err) {
+            alert('❌ Failed to import: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function clearAllData() {
+    if (!confirm('⚠️ WARNING: This will DELETE all your commander data, colonies, ships, materials, and bookmarks. This cannot be undone.\n\nAre you sure?')) return;
+    
+    const keys = ['elite_cmdr', 'elite_colonies', 'elite_ships', 'elite_materials', 'elite_bookmarks', 'elite_activity', 'elite_shopping', 'inara_api_key'];
+    keys.forEach(k => localStorage.removeItem(k));
+    
+    // Refresh UI
+    displayCommander();
+    renderColonies();
+    renderShips();
+    renderMaterials('all');
+    renderShoppingList();
+    renderBookmarks('all');
+    renderActivity();
+    
+    alert('🗑️ All data cleared. Export next time before clearing!');
+    logActivity('All data cleared');
+}
+
 // ===== INARA API INTEGRATION =====
-async function fetchInaraProfile() {
+let inaraSyncedData = null;
+
+async function syncInara() {
     const apiKey = localStorage.getItem('inara_api_key');
     if (!apiKey) {
-        alert('Please set your Inara API key first in the Inara.cz tab');
-        return null;
+        alert('Please save your Inara API key first');
+        return;
     }
     
+    const cmdrName = document.getElementById('inara-cmdr').value;
+    if (!cmdrName) {
+        alert('Please enter your CMDR name');
+        return;
+    }
+    
+    const status = document.getElementById('inara-sync-status');
+    status.style.display = 'block';
+    status.innerHTML = '<div class="loading">Fetching from Inara.cz</div>';
+    
     try {
-        const cmdrName = JSON.parse(localStorage.getItem('elite_cmdr') || '{}').name;
-        if (!cmdrName) {
-            alert('Please enter your Commander name in the Dashboard first');
-            return null;
-        }
-        
         const response = await fetch('/api/inara_profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ apiKey, cmdrName })
         });
         const data = await response.json();
-        return data;
+        
+        if (data.error) {
+            status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Error: ${data.error}</div></div>`;
+            return;
+        }
+        
+        // Parse Inara response
+        const events = data.events || [];
+        if (events.length === 0 || events[0].eventStatus === 'error') {
+            status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Inara API error: ${events[0]?.eventStatusText || 'Unknown error'}</div></div>`;
+            return;
+        }
+        
+        const eventData = events[0].eventData || {};
+        inaraSyncedData = {
+            name: eventData.userName || cmdrName,
+            credits: eventData.credits || 0,
+            combatRank: eventData.combatRank || '?',
+            tradeRank: eventData.tradeRank || '?',
+            exploreRank: eventData.exploreRank || '?',
+            shipName: eventData.shipName || '?',
+            shipIdent: eventData.shipIdent || '',
+            materials: eventData.materials || [],
+            systemsVisited: eventData.systemsVisited || 0
+        };
+        
+        // Show success + data
+        status.innerHTML = `<div class="result-item" style="border-left-color:var(--green)">
+            <div class="station-info">✅ Sync successful! Found: ${inaraSyncedData.name}</div>
+        </div>`;
+        
+        // Show profile card
+        document.getElementById('inara-profile').style.display = 'block';
+        document.getElementById('inara-data').innerHTML = `
+            <div class="stat-grid" style="margin-bottom:15px;">
+                <div class="stat-box"><div class="value">${inaraSyncedData.name}</div><div class="label">Commander</div></div>
+                <div class="stat-box"><div class="value">${inaraSyncedData.combatRank}</div><div class="label">Combat</div></div>
+                <div class="stat-box"><div class="value">${inaraSyncedData.tradeRank}</div><div class="label">Trade</div></div>
+                <div class="stat-box"><div class="value">${inaraSyncedData.exploreRank}</div><div class="label">Explore</div></div>
+                <div class="stat-box"><div class="value">${(inaraSyncedData.credits || 0).toLocaleString()}</div><div class="label">Credits (CR)</div></div>
+                <div class="stat-box"><div class="value">${inaraSyncedData.systemsVisited}</div><div class="label">Systems Visited</div></div>
+            </div>
+            <div class="station-info" style="margin-top:10px;">
+                <strong>Current Ship:</strong> ${inaraSyncedData.shipName || 'Unknown'}
+                ${inaraSyncedData.shipIdent ? ` (${inaraSyncedData.shipIdent})` : ''}
+            </div>
+        `;
+        
+        logActivity(`Synced with Inara: ${inaraSyncedData.name}`);
+        
     } catch (e) {
-        console.error('Inara error:', e);
-        return null;
+        status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Error: ${e.message}</div></div>`;
+        console.error('Inara sync error:', e);
     }
+}
+
+function applyToDashboard() {
+    if (!inaraSyncedData) {
+        alert('No synced data to import. Sync from Inara first.');
+        return;
+    }
+    
+    // Update commander profile
+    const cmdr = JSON.parse(localStorage.getItem('elite_cmdr') || '{}');
+    cmdr.name = inaraSyncedData.name;
+    cmdr.credits = inaraSyncedData.credits;
+    cmdr.ranks = `${inaraSyncedData.combatRank} / ${inaraSyncedData.tradeRank} / ${inaraSyncedData.exploreRank}`;
+    cmdr.ship = inaraSyncedData.shipName;
+    
+    localStorage.setItem('elite_cmdr', JSON.stringify(cmdr));
+    displayCommander();
+    
+    // Also add ship if not exists
+    if (inaraSyncedData.shipName && inaraSyncedData.shipName !== 'Unknown') {
+        const ships = JSON.parse(localStorage.getItem('elite_ships') || '[]');
+        if (!ships.some(s => s.name === inaraSyncedData.shipName)) {
+            ships.push({
+                name: inaraSyncedData.shipName,
+                role: 'General',
+                build: 'Stock',
+                created: new Date().toLocaleString()
+            });
+            localStorage.setItem('elite_ships', JSON.stringify(ships));
+        }
+    }
+    
+    // Sync materials
+    if (inaraSyncedData.materials && inaraSyncedData.materials.length > 0) {
+        const materials = JSON.parse(localStorage.getItem('elite_materials') || '[]');
+        inaraSyncedData.materials.forEach(m => {
+            const existing = materials.findIndex(x => x.name.toLowerCase() === m.name.toLowerCase());
+            if (existing >= 0) {
+                materials[existing].qty = m.quantity || m.qty || 1;
+            } else {
+                materials.push({
+                    name: m.name,
+                    type: m.category || 'Raw',
+                    qty: m.quantity || 1,
+                    grade: m.grade || 1
+                });
+            }
+        });
+        localStorage.setItem('elite_materials', JSON.stringify(materials));
+    }
+    
+    renderShips();
+    renderMaterials('all');
+    logActivity('Imported Inara data to Dashboard');
+    alert('✅ Commander data imported to Dashboard!');
 }
 
 // Initialize
