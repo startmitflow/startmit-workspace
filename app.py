@@ -751,6 +751,24 @@ HTML_TEMPLATE = """
             <span class="icon">🔗</span><span class="label">Inara.cz</span>
         </div>
     </div>
+    <div class="nav-section">
+        <div class="nav-section-title">Commander</div>
+        <div class="nav-item" onclick="showPage('commander')">
+            <span class="icon">👤</span><span class="label">Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="showPage('colonies')">
+            <span class="icon">🏰</span><span class="label">My Colonies</span>
+        </div>
+        <div class="nav-item" onclick="showPage('ships')">
+            <span class="icon">🚀</span><span class="label">Ship Hangar</span>
+        </div>
+        <div class="nav-item" onclick="showPage('materials')">
+            <span class="icon">📦</span><span class="label">Materials</span>
+        </div>
+        <div class="nav-item" onclick="showPage('bookmarks')">
+            <span class="icon">⭐</span><span class="label">Bookmarks</span>
+        </div>
+    </div>
 </nav>
 
 <!-- MAIN CONTENT -->
@@ -1112,6 +1130,323 @@ HTML_TEMPLATE = """
         <p style="color:var(--text-dim);font-size:0.85em;">
             Inara API requires user authentication. Without an API key, some features will show placeholder data.
         </p>
+    </div>
+</div>
+
+<!-- COMMANDER DASHBOARD PAGE -->
+<div id="page-commander" class="page">
+    <div class="page-header">
+        <h2>👤 Commander Dashboard</h2>
+        <p>Your Elite Dangerous command center</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Commander Profile</span></div>
+        <div class="form-grid" style="margin-bottom:15px;">
+            <div class="form-group">
+                <label>Commander Name (CMDR)</label>
+                <input type="text" id="cmdr-name" placeholder="Your CMDR name">
+            </div>
+            <div class="form-group">
+                <label>Current Ship</label>
+                <input type="text" id="cmdr-ship" placeholder="e.g. Anaconda, Corvette">
+            </div>
+            <div class="form-group">
+                <label>Home System</label>
+                <input type="text" id="cmdr-home" placeholder="e.g. Sol, Diaguandi">
+            </div>
+            <div class="form-group">
+                <label>Current Location</label>
+                <input type="text" id="cmdr-location" placeholder="Current system">
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Credits (CR)</label>
+                <input type="text" id="cmdr-credits" placeholder="e.g. 1,500,000,000">
+            </div>
+            <div class="form-group">
+                <label>Ranks (Combat/Trade/Explore)</label>
+                <input type="text" id="cmdr-ranks" placeholder="e.g. Expert/Master/Elite">
+            </div>
+        </div>
+        <button onclick="saveCommander()">Save Profile</button>
+    </div>
+    
+    <div id="cmdr-display" class="card" style="display:none;">
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="value" id="disp-name">-</div>
+                <div class="label">Commander</div>
+            </div>
+            <div class="stat-box">
+                <div class="value" id="disp-ship">-</div>
+                <div class="label">Current Ship</div>
+            </div>
+            <div class="stat-box">
+                <div class="value" id="disp-location">-</div>
+                <div class="label">Location</div>
+            </div>
+            <div class="stat-box">
+                <div class="value" id="disp-credits">-</div>
+                <div class="label">Credits</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Quick Actions</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <button class="secondary" onclick="quickAction('plot-home')">📍 Plot Route Home</button>
+            <button class="secondary" onclick="quickAction('nearest-station')">🏢 Nearest Station</button>
+            <button class="secondary" onclick="quickAction('nearest-fuel')">⛽ Nearest Fuel</button>
+            <button class="secondary" onclick="quickAction('nearest-repair')">🔧 Nearest Repair</button>
+            <button class="secondary" onclick="quickAction('nearest-material-trader')">🔄 Material Trader</button>
+            <button class="secondary" onclick="quickAction('nearest-tech-broker')">⚙️ Tech Broker</button>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Recent Activity</span></div>
+        <div id="activity-log" class="results-grid">
+            <p style="color:var(--text-dim);font-size:0.85em;">No recent activity. Start exploring!</p>
+        </div>
+    </div>
+</div>
+
+<!-- MY COLONIES PAGE -->
+<div id="page-colonies" class="page">
+    <div class="page-header">
+        <h2>🏰 My Colonies</h2>
+        <p>Track your colonized systems and facility progress</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Add Colonized System</span></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>System Name</label>
+                <input type="text" id="colony-system" placeholder="e.g. Beta Hydri">
+            </div>
+            <div class="form-group">
+                <label>Station Name</label>
+                <input type="text" id="colony-station" placeholder="e.g. Markov Station">
+            </div>
+            <div class="form-group">
+                <label>Station Type</label>
+                <select id="colony-type">
+                    <option value="Orbital Station">Orbital Station</option>
+                    <option value=" planetary Outpost">Planetary Outpost</option>
+                    <option value="Planetary Port">Planetary Port</option>
+                    <option value="Fleet Carrier">Fleet Carrier</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="addColony()">Add Colony</button>
+    </div>
+    
+    <div id="colonies-list" class="card">
+        <div class="card-header"><span class="card-title">Your Colonies</span></div>
+        <div id="colonies-results" class="results-grid"></div>
+    </div>
+    
+    <div id="colony-detail" class="card" style="display:none;">
+        <div class="card-header">
+            <span class="card-title" id="colony-detail-name">Colony Name</span>
+            <button class="secondary" onclick="closeColonyDetail()">← Back</button>
+        </div>
+        
+        <div class="form-grid" style="margin-bottom:15px;">
+            <div class="form-group">
+                <label>Built Facilities</label>
+                <div id="colony-facilities" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
+            </div>
+        </div>
+        
+        <h4 style="color:var(--cyan);margin:15px 0 10px;">Add Facility</h4>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Facility Type</label>
+                <select id="add-facility">
+                    <option value="High Tech Hub">High Tech Hub</option>
+                    <option value="Industrial Hub">Industrial Hub</option>
+                    <option value="Mining Hub">Mining Hub</option>
+                    <option value="Refinery Hub">Refinery Hub</option>
+                    <option value="Trading Hub">Trading Hub</option>
+                    <option value="Exploration Hub">Exploration Hub</option>
+                    <option value="Military Installation">Military Installation</option>
+                    <option value="Terraforming Hub">Terraforming Hub</option>
+                    <option value="Research Lab">Research Lab</option>
+                    <option value="Shipyard Hub">Shipyard Hub</option>
+                    <option value="Farm Complex">Farm Complex</option>
+                    <option value="Power Plant">Power Plant</option>
+                    <option value="Water Treatment">Water Treatment</option>
+                    <option value="Communications Array">Communications Array</option>
+                    <option value="Mission Board">Mission Board</option>
+                    <option value="Barracks">Barracks</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="addFacility()">Add Facility</button>
+        
+        <h4 style="color:var(--cyan);margin:15px 0 10px;">Colony Stats</h4>
+        <div id="colony-stats" class="stat-grid"></div>
+    </div>
+</div>
+
+<!-- SHIP HANGAR PAGE -->
+<div id="page-ships" class="page">
+    <div class="page-header">
+        <h2>🚀 Ship Hangar</h2>
+        <p>Track your ships and their loadouts</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Add Ship</span></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Ship Type</label>
+                <input type="text" id="ship-name" placeholder="e.g. Anaconda, Python, Krait Phantom">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="ship-role">
+                    <option value="Combat">Combat</option>
+                    <option value="Trading">Trading</option>
+                    <option value="Exploration">Exploration</option>
+                    <option value="Mining">Mining</option>
+                    <option value="Passenger">Passenger</option>
+                    <option value="Mission Running">Mission Running</option>
+                    <option value="PvP">PvP</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Build Status</label>
+                <select id="ship-build">
+                    <option value="Stock">Stock</option>
+                    <option value="Partial">Partial Engineering</option>
+                    <option value="Full">Fully Engineered</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="addShip()">Add Ship</button>
+    </div>
+    
+    <div id="ships-list" class="card">
+        <div class="card-header"><span class="card-title">Your Ships</span></div>
+        <div id="ships-results" class="results-grid"></div>
+    </div>
+</div>
+
+<!-- MATERIALS PAGE -->
+<div id="page-materials" class="page">
+    <div class="page-header">
+        <h2>📦 Material Inventory</h2>
+        <p>Track your engineering materials and synthesis needs</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Add Material</span></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Material Name</label>
+                <input type="text" id="mat-name" placeholder="e.g. Phosphorus, Encoded, Micro Controllers">
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="mat-type">
+                    <option value="Raw">Raw</option>
+                    <option value="Encoded">Encoded</option>
+                    <option value="Manufactured">Manufactured</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="mat-qty" placeholder="e.g. 27" value="1">
+            </div>
+            <div class="form-group">
+                <label>Grade (1-5)</label>
+                <select id="mat-grade">
+                    <option value="1">Grade 1</option>
+                    <option value="2">Grade 2</option>
+                    <option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option>
+                    <option value="5">Grade 5</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="addMaterial()">Add Material</button>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Material Categories</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+            <button class="secondary" onclick="filterMaterials('all')">All</button>
+            <button class="secondary" onclick="filterMaterials('Raw')">Raw</button>
+            <button class="secondary" onclick="filterMaterials('Encoded')">Encoded</button>
+            <button class="secondary" onclick="filterMaterials('Manufactured')">Manufactured</button>
+        </div>
+        <div id="materials-results" class="results-grid"></div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Shopping List</span></div>
+        <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Materials you need to gather for your next engineering goal</p>
+        <div id="shopping-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        <div style="margin-top:10px;">
+            <input type="text" id="shopping-mat" placeholder="Add to shopping list..." style="max-width:200px;">
+            <button class="secondary" onclick="addToShopping()">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- BOOKMARKS PAGE -->
+<div id="page-bookmarks" class="page">
+    <div class="page-header">
+        <h2>⭐ Bookmarks</h2>
+        <p>Save your favorite systems, stations, and routes</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Add Bookmark</span></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Type</label>
+                <select id="bm-type">
+                    <option value="System">System</option>
+                    <option value="Station">Station</option>
+                    <option value="Route">Route</option>
+                    <option value="POI">Point of Interest</option>
+                    <option value="Mining">Mining Spot</option>
+                    <option value="Combat">Combat Zone</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="bm-name" placeholder="Bookmark name">
+            </div>
+            <div class="form-group">
+                <label>Location / System</label>
+                <input type="text" id="bm-location" placeholder="e.g. Core Dynamics, Sol">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <input type="text" id="bm-notes" placeholder="Optional notes">
+            </div>
+        </div>
+        <button onclick="addBookmark()">Add Bookmark</button>
+    </div>
+    
+    <div class="card">
+        <div class="card-header"><span class="card-title">Your Bookmarks</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+            <button class="secondary" onclick="filterBookmarks('all')">All</button>
+            <button class="secondary" onclick="filterBookmarks('System')">Systems</button>
+            <button class="secondary" onclick="filterBookmarks('Station')">Stations</button>
+            <button class="secondary" onclick="filterBookmarks('Mining')">Mining</button>
+            <button class="secondary" onclick="filterBookmarks('POI')">POIs</button>
+        </div>
+        <div id="bookmarks-results" class="results-grid"></div>
     </div>
 </div>
 
@@ -1672,12 +2007,461 @@ function saveInaraKey() {
     alert('API key saved! Some features require Inara account linking.');
 }
 
+// ===== COMMANDER DASHBOARD =====
+function saveCommander() {
+    const cmdr = {
+        name: document.getElementById('cmdr-name').value,
+        ship: document.getElementById('cmdr-ship').value,
+        home: document.getElementById('cmdr-home').value,
+        location: document.getElementById('cmdr-location').value,
+        credits: document.getElementById('cmdr-credits').value,
+        ranks: document.getElementById('cmdr-ranks').value
+    };
+    localStorage.setItem('elite_cmdr', JSON.stringify(cmdr));
+    displayCommander();
+    logActivity('Profile updated');
+    alert('Commander profile saved!');
+}
+
+function displayCommander() {
+    const stored = localStorage.getItem('elite_cmdr');
+    const display = document.getElementById('cmdr-display');
+    if (stored) {
+        const cmdr = JSON.parse(stored);
+        document.getElementById('disp-name').textContent = cmdr.name || '-';
+        document.getElementById('disp-ship').textContent = cmdr.ship || '-';
+        document.getElementById('disp-location').textContent = cmdr.location || cmdr.home || '-';
+        document.getElementById('disp-credits').textContent = cmdr.credits ? parseInt(cmdr.credits).toLocaleString() + ' CR' : '-';
+        display.style.display = 'block';
+        // Also populate form fields
+        document.getElementById('cmdr-name').value = cmdr.name || '';
+        document.getElementById('cmdr-ship').value = cmdr.ship || '';
+        document.getElementById('cmdr-home').value = cmdr.home || '';
+        document.getElementById('cmdr-location').value = cmdr.location || '';
+        document.getElementById('cmdr-credits').value = cmdr.credits || '';
+        document.getElementById('cmdr-ranks').value = cmdr.ranks || '';
+    } else {
+        display.style.display = 'none';
+    }
+}
+
+function logActivity(action) {
+    const log = JSON.parse(localStorage.getItem('elite_activity') || '[]');
+    const entry = { time: new Date().toLocaleString(), action };
+    log.unshift(entry);
+    if (log.length > 10) log.pop();
+    localStorage.setItem('elite_activity', JSON.stringify(log));
+    renderActivity();
+}
+
+function renderActivity() {
+    const log = JSON.parse(localStorage.getItem('elite_activity') || '[]');
+    const container = document.getElementById('activity-log');
+    if (log.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-dim);font-size:0.85em;">No recent activity. Start exploring!</p>';
+        return;
+    }
+    container.innerHTML = log.map(e => `
+        <div class="result-item">
+            <div class="station-info">${e.time} — ${e.action}</div>
+        </div>
+    `).join('');
+}
+
+function quickAction(action) {
+    const cmdr = JSON.parse(localStorage.getItem('elite_cmdr') || '{}');
+    const home = cmdr.home || 'Sol';
+    const location = cmdr.location || home;
+    
+    let msg = '';
+    switch(action) {
+        case 'plot-home':
+            msg = `Plot route from ${location} to ${home}`;
+            logActivity(`Route: ${location} → ${home}`);
+            break;
+        case 'nearest-station':
+            msg = `Finding nearest station to ${location}...`;
+            logActivity(`Search: nearest station`);
+            break;
+        case 'nearest-fuel':
+            msg = `Finding nearest station with fuel in ${location}...`;
+            logActivity(`Search: fuel station`);
+            break;
+        case 'nearest-repair':
+            msg = `Finding nearest repair station in ${location}...`;
+            logActivity(`Search: repair station`);
+            break;
+        case 'nearest-material-trader':
+            document.getElementById('service-system').value = location;
+            document.getElementById('service-type').value = 'Material Trader';
+            showPage('services');
+            searchServices();
+            return;
+        case 'nearest-tech-broker':
+            document.getElementById('service-system').value = location;
+            document.getElementById('service-type').value = 'Technology Broker';
+            showPage('services');
+            searchServices();
+            return;
+    }
+    alert(msg);
+}
+
+// ===== COLONIES =====
+function addColony() {
+    const system = document.getElementById('colony-system').value;
+    const station = document.getElementById('colony-station').value;
+    const type = document.getElementById('colony-type').value;
+    
+    if (!system) { alert('Please enter system name'); return; }
+    
+    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
+    // Check if already exists
+    if (colonies.some(c => c.system === system)) {
+        alert('System already in colonies list');
+        return;
+    }
+    
+    colonies.push({
+        system, station: station || 'Unknown', 
+        type, facilities: [],
+        stats: { tech_level: 1, wealth: 0, population: 0, security: 10, sol: 10 },
+        created: new Date().toLocaleString()
+    });
+    
+    localStorage.setItem('elite_colonies', JSON.stringify(colonies));
+    document.getElementById('colony-system').value = '';
+    document.getElementById('colony-station').value = '';
+    renderColonies();
+    logActivity(`Colony added: ${system}`);
+    alert('Colony added!');
+}
+
+function renderColonies() {
+    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
+    const container = document.getElementById('colonies-results');
+    
+    if (colonies.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-dim);">No colonies yet. Add your first colonized system!</p>';
+        return;
+    }
+    
+    container.innerHTML = colonies.map((c, i) => `
+        <div class="result-item" onclick="openColonyDetail(${i})">
+            <div class="station-name">${c.system}</div>
+            <div class="station-info">
+                ${c.station} (${c.type})<br>
+                Facilities: ${c.facilities.length} | Created: ${c.created}<br>
+                ${c.facilities.map(f => '<span class="service-badge green">' + f + '</span>').join(' ')}
+            </div>
+        </div>
+    `).join('');
+}
+
+let currentColonyIndex = -1;
+
+function openColonyDetail(index) {
+    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
+    currentColonyIndex = index;
+    const colony = colonies[index];
+    
+    document.getElementById('colony-detail-name').textContent = colony.system;
+    
+    const facilitiesContainer = document.getElementById('colony-facilities');
+    if (colony.facilities.length === 0) {
+        facilitiesContainer.innerHTML = '<span style="color:var(--text-dim);font-size:0.85em;">No facilities built yet</span>';
+    } else {
+        facilitiesContainer.innerHTML = colony.facilities.map(f => '<span class="service-badge green">' + f + '</span>').join('');
+    }
+    
+    // Colony stats
+    const stats = colony.stats || { tech_level: 1, wealth: 0, population: 0, security: 10, sol: 10 };
+    document.getElementById('colony-stats').innerHTML = `
+        <div class="stat-box"><div class="value">${stats.tech_level}</div><div class="label">Tech Level</div></div>
+        <div class="stat-box"><div class="value">${stats.wealth}</div><div class="label">Wealth</div></div>
+        <div class="stat-box"><div class="value">${stats.population}</div><div class="label">Population</div></div>
+        <div class="stat-box"><div class="value">${stats.security}%</div><div class="label">Security</div></div>
+    `;
+    
+    document.getElementById('colonies-list').style.display = 'none';
+    document.getElementById('colony-detail').style.display = 'block';
+}
+
+function closeColonyDetail() {
+    document.getElementById('colonies-list').style.display = 'block';
+    document.getElementById('colony-detail').style.display = 'none';
+    currentColonyIndex = -1;
+}
+
+function addFacility() {
+    if (currentColonyIndex < 0) return;
+    const facility = document.getElementById('add-facility').value;
+    
+    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
+    if (!colonies[currentColonyIndex].facilities.includes(facility)) {
+        colonies[currentColonyIndex].facilities.push(facility);
+        // Update stats based on facility
+        const stats = colonies[currentColonyIndex].stats;
+        const facilityStats = {
+            'High Tech Hub': { tech_level: 20, wealth: 15 },
+            'Industrial Hub': { tech_level: 10, wealth: 20, population: 15 },
+            'Mining Hub': { wealth: 20, tech_level: 5 },
+            'Refinery Hub': { wealth: 15, population: 10 },
+            'Trading Hub': { wealth: 25, sol: 15 },
+            'Exploration Hub': { tech_level: 15, sol: 10 },
+            'Military Installation': { security: 25, tech_level: 5 },
+            'Terraforming Hub': { population: 25, sol: 20, tech_level: 15 },
+            'Research Lab': { tech_level: 30, sol: 10 },
+            'Shipyard Hub': { tech_level: 15, wealth: 20 },
+            'Farm Complex': { population: 15, sol: 10 },
+            'Power Plant': { tech_level: 10, population: 5 },
+            'Water Treatment': { sol: 15, population: 10 },
+            'Communications Array': { population: 10, tech_level: 5 },
+            'Mission Board': { sol: 15 },
+            'Barracks': { security: 20 }
+        };
+        const bonus = facilityStats[facility] || {};
+        Object.keys(bonus).forEach(k => stats[k] = (stats[k] || 0) + bonus[k]);
+        
+        localStorage.setItem('elite_colonies', JSON.stringify(colonies));
+        openColonyDetail(currentColonyIndex);
+        renderColonies();
+        logActivity(`Built: ${facility}`);
+        alert('Facility added!');
+    } else {
+        alert('Facility already built');
+    }
+}
+
+// ===== SHIPS =====
+function addShip() {
+    const name = document.getElementById('ship-name').value;
+    const role = document.getElementById('ship-role').value;
+    const build = document.getElementById('ship-build').value;
+    
+    if (!name) { alert('Please enter ship name'); return; }
+    
+    const ships = JSON.parse(localStorage.getItem('elite_ships') || '[]');
+    ships.push({ name, role, build, modules: [], created: new Date().toLocaleString() });
+    localStorage.setItem('elite_ships', JSON.stringify(ships));
+    document.getElementById('ship-name').value = '';
+    renderShips();
+    logActivity(`Ship added: ${name}`);
+    alert('Ship added!');
+}
+
+function renderShips() {
+    const ships = JSON.parse(localStorage.getItem('elite_ships') || '[]');
+    const container = document.getElementById('ships-results');
+    
+    if (ships.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-dim);">No ships in hangar. Add your first ship!</p>';
+        return;
+    }
+    
+    const roleColors = { Combat: 'red', Trading: 'green', Exploration: 'cyan', Mining: 'orange', Passenger: 'purple', 'Mission Running': 'yellow', PvP: 'red' };
+    
+    container.innerHTML = ships.map((s, i) => `
+        <div class="result-item">
+            <div class="station-name">${s.name}</div>
+            <div class="station-info">
+                <span class="service-badge" style="background:rgba(${roleColors[s.role]==='red'?'255,71,87':roleColors[s.role]==='green'?'0,255,136':roleColors[s.role]==='cyan'?'0,212,255':roleColors[s.role]==='orange'?'255,165,0':roleColors[s.role]==='purple'?'165,94,234':'255,165,0'},0.2);color:var(--${roleColors[s.role]==='red'?'red':roleColors[s.role]==='green'?'green':roleColors[s.role]==='cyan'?'cyan':roleColors[s.role]==='orange'?'orange':roleColors[s.role]==='purple'?'purple':'orange'})">${s.role}</span>
+                <span class="service-badge ${s.build === 'Full' ? 'green' : s.build === 'Partial' ? 'orange' : ''}">${s.build}</span>
+                <br>Added: ${s.created}
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== MATERIALS =====
+function addMaterial() {
+    const name = document.getElementById('mat-name').value;
+    const type = document.getElementById('mat-type').value;
+    const qty = parseInt(document.getElementById('mat-qty').value) || 1;
+    const grade = parseInt(document.getElementById('mat-grade').value) || 1;
+    
+    if (!name) { alert('Please enter material name'); return; }
+    
+    const materials = JSON.parse(localStorage.getItem('elite_materials') || '[]');
+    const existing = materials.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+    if (existing >= 0) {
+        materials[existing].qty += qty;
+    } else {
+        materials.push({ name, type, qty, grade });
+    }
+    
+    localStorage.setItem('elite_materials', JSON.stringify(materials));
+    document.getElementById('mat-name').value = '';
+    document.getElementById('mat-qty').value = '1';
+    renderMaterials('all');
+    logActivity(`Material: ${name} x${qty}`);
+}
+
+let currentMatFilter = 'all';
+
+function filterMaterials(type) {
+    currentMatFilter = type;
+    renderMaterials(type);
+}
+
+function renderMaterials(type) {
+    const materials = JSON.parse(localStorage.getItem('elite_materials') || '[]');
+    const container = document.getElementById('materials-results');
+    const filtered = type === 'all' ? materials : materials.filter(m => m.type === type);
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-dim);">No materials in inventory</p>';
+        return;
+    }
+    
+    const typeColors = { Raw: 'green', Encoded: 'cyan', Manufactured: 'orange' };
+    
+    container.innerHTML = filtered.sort((a, b) => a.name.localeCompare(b.name)).map(m => `
+        <div class="result-item">
+            <div class="station-name">${m.name}</div>
+            <div class="station-info">
+                <span class="material-chip ${m.type.toLowerCase()}">${m.type}</span>
+                Grade ${m.grade} | Qty: ${m.qty}
+            </div>
+        </div>
+    `).join('');
+}
+
+function addToShopping() {
+    const mat = document.getElementById('shopping-mat').value;
+    if (!mat) return;
+    
+    const list = JSON.parse(localStorage.getItem('elite_shopping') || '[]');
+    if (!list.includes(mat)) {
+        list.push(mat);
+        localStorage.setItem('elite_shopping', JSON.stringify(list));
+    }
+    document.getElementById('shopping-mat').value = '';
+    renderShoppingList();
+}
+
+function renderShoppingList() {
+    const list = JSON.parse(localStorage.getItem('elite_shopping') || '[]');
+    const container = document.getElementById('shopping-list');
+    
+    if (list.length === 0) {
+        container.innerHTML = '<span style="color:var(--text-dim);font-size:0.85em;">Shopping list empty</span>';
+        return;
+    }
+    
+    container.innerHTML = list.map((m, i) => `<span class="material-chip" onclick="removeShopping(${i})" style="cursor:pointer;" title="Click to remove">${m} ×</span>`).join('');
+}
+
+function removeShopping(index) {
+    const list = JSON.parse(localStorage.getItem('elite_shopping') || '[]');
+    list.splice(index, 1);
+    localStorage.setItem('elite_shopping', JSON.stringify(list));
+    renderShoppingList();
+}
+
+// ===== BOOKMARKS =====
+function addBookmark() {
+    const type = document.getElementById('bm-type').value;
+    const name = document.getElementById('bm-name').value;
+    const location = document.getElementById('bm-location').value;
+    const notes = document.getElementById('bm-notes').value;
+    
+    if (!name) { alert('Please enter a name'); return; }
+    
+    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
+    bookmarks.push({ type, name, location: location || '', notes: notes || '', created: new Date().toLocaleString() });
+    localStorage.setItem('elite_bookmarks', JSON.stringify(bookmarks));
+    document.getElementById('bm-name').value = '';
+    document.getElementById('bm-location').value = '';
+    document.getElementById('bm-notes').value = '';
+    renderBookmarks('all');
+    logActivity(`Bookmark added: ${name}`);
+    alert('Bookmark added!');
+}
+
+let currentBmFilter = 'all';
+
+function filterBookmarks(type) {
+    currentBmFilter = type;
+    renderBookmarks(type);
+}
+
+function renderBookmarks(type) {
+    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
+    const container = document.getElementById('bookmarks-results');
+    const filtered = type === 'all' ? bookmarks : bookmarks.filter(b => b.type === type);
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-dim);">No bookmarks yet</p>';
+        return;
+    }
+    
+    const typeIcons = { System: '🌟', Station: '🏢', Route: '📍', POI: '📌', Mining: '⛏️', Combat: '⚔️' };
+    
+    container.innerHTML = filtered.map((b, i) => `
+        <div class="result-item">
+            <div class="station-name">${typeIcons[b.type] || '📍'} ${b.name}</div>
+            <div class="station-info">
+                <span class="service-badge">${b.type}</span> ${b.location ? '— ' + b.location : ''}<br>
+                ${b.notes ? 'Notes: ' + b.notes + '<br>' : ''}
+                <button class="secondary" onclick="deleteBookmark(${i})" style="padding:3px 8px;font-size:0.75em;margin-top:5px;">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteBookmark(index) {
+    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
+    const name = bookmarks[index].name;
+    bookmarks.splice(index, 1);
+    localStorage.setItem('elite_bookmarks', JSON.stringify(bookmarks));
+    renderBookmarks(currentBmFilter);
+    logActivity(`Bookmark removed: ${name}`);
+}
+
+// ===== INARA API INTEGRATION =====
+async function fetchInaraProfile() {
+    const apiKey = localStorage.getItem('inara_api_key');
+    if (!apiKey) {
+        alert('Please set your Inara API key first in the Inara.cz tab');
+        return null;
+    }
+    
+    try {
+        const cmdrName = JSON.parse(localStorage.getItem('elite_cmdr') || '{}').name;
+        if (!cmdrName) {
+            alert('Please enter your Commander name in the Dashboard first');
+            return null;
+        }
+        
+        const response = await fetch('/api/inara_profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ apiKey, cmdrName })
+        });
+        const data = await response.json();
+        return data;
+    } catch (e) {
+        console.error('Inara error:', e);
+        return null;
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     updateBlueprints();
     loadStateGuide();
     loadGuardianSites();
     loadThargoidSites();
+    
+    // Load saved data
+    displayCommander();
+    renderColonies();
+    renderShips();
+    renderMaterials('all');
+    renderShoppingList();
+    renderBookmarks('all');
+    renderActivity();
     
     // Close modal on escape
     document.addEventListener('keydown', (e) => {
@@ -2025,6 +2809,123 @@ def api_fleet_carrier():
         "error": "Fleet carrier search requires EDDB.io API integration. Try searching at eddb.io",
         "carriers": []
     })
+
+@app.route('/api/inara_profile', methods=['POST'])
+def api_inara_profile():
+    """Proxy for Inara.cz API to fetch commander profile"""
+    data = request.get_json()
+    api_key = data.get('apiKey', '')
+    cmdr_name = data.get('cmdrName', '')
+    
+    if not api_key or not cmdr_name:
+        return jsonify({"error": "API key and commander name required"})
+    
+    # Inara API call
+    payload = {
+        "header": {
+            "appName": "StartMit Elite Companion",
+            "appVersion": "1.0",
+            "APIKey": api_key
+        },
+        "events": [{
+            "eventName": "getCommanderProfile",
+            "eventData": {"searchName": cmdr_name}
+        }]
+    }
+    
+    try:
+        req = urllib.request.Request(
+            INARA_API,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={"Content-Type": "application/json", "User-Agent": "StartMit-EliteCompanion/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=30) as response:
+            result = json.loads(response.read().decode())
+            return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@app.route('/api/route_plot', methods=['GET'])
+def api_route_plot():
+    """Calculate route between two systems"""
+    from_sys = request.args.get('from', '')
+    to_sys = request.args.get('to', '')
+    
+    if not from_sys or not to_sys:
+        return jsonify({"error": "Both systems required"})
+    
+    from_info = get_system_info(from_sys)
+    to_info = get_system_info(to_sys)
+    
+    from_coords = from_info.get("coords", {})
+    to_coords = to_info.get("coords", {})
+    
+    distance = calculate_distance(from_coords, to_coords)
+    
+    return jsonify({
+        "from": from_sys,
+        "to": to_sys,
+        "distance": distance,
+        "fromCoords": from_coords,
+        "toCoords": to_coords
+    })
+
+@app.route('/api/nearest_service', methods=['GET'])
+def api_nearest_service():
+    """Find nearest station with specific service"""
+    system = request.args.get('system', '')
+    service = request.args.get('service', '')
+    
+    if not system:
+        return jsonify({"error": "System required"})
+    
+    # Get nearby systems
+    nearby = get_systems_in_radius(system, 30)
+    
+    all_stations = []
+    
+    # Search nearby systems for the service
+    for nearby_system in (nearby if isinstance(nearby, list) else []):
+        if isinstance(nearby_system, dict) and nearby_system.get("name"):
+            stations_data = get_stations(nearby_system["name"])
+            if not stations_data.get("error"):
+                for s in stations_data.get("stations", []):
+                    if has_service(s, service):
+                        dist = calculate_distance(
+                            nearby_system.get("coords", {}),
+                            get_system_info(system).get("coords", {})
+                        )
+                        all_stations.append({
+                            "name": s.get("name"),
+                            "system": nearby_system["name"],
+                            "distance": dist or 0,
+                            "type": s.get("type")
+                        })
+    
+    all_stations.sort(key=lambda x: x.get("distance", 999))
+    
+    return jsonify({
+        "system": system,
+        "service": service,
+        "stations": all_stations[:10]
+    })
+
+def has_service(station, service):
+    """Check if station has a specific service"""
+    service_map = {
+        "Material Trader": ["hasMarket"],
+        "Technology Broker": ["hasTechnology"],
+        "Interstellar Factors": ["hasInterstellarFactors"],
+        "Outfitting": ["haveOutfitting"],
+        "Shipyard": ["haveShipyard"],
+        "Repair": ["hasRepair"],
+        "Refuel": ["hasRefuel"],
+        "Restock": ["hasRestock"],
+        "Black Market": ["hasBlackMarket"],
+        "Universal Cartographics": ["hasUniversalCartographics"]
+    }
+    flags = service_map.get(service, ["haveMarket"])
+    return any(station.get(f) for f in flags)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
