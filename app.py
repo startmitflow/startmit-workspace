@@ -137,6 +137,18 @@ COLONY_FACILITIES = {
         {"id": "exploration_hub", "name": "Exploration Hub", "tier": 1,
          "requires": [], "gives": {"tech_level": 15, "standard_of_living": 10},
          "cost": {"CMM Composite": 350, "Survey Equipment": 250}},
+        {"id": "mining_hub", "name": "Mining Hub", "tier": 1,
+         "requires": [], "gives": {"wealth": 20, "tech_level": 5},
+         "cost": {"CMM Composite": 400, "Mining Equipment": 300}},
+        {"id": "terraforming_hub", "name": "Terraforming Hub", "tier": 2,
+         "requires": ["high_tech_hub"], "gives": {"population_growth": 25, "standard_of_living": 20, "tech_level": 15},
+         "cost": {"CMM Composite": 600, "Insulating Membrane": 500, "Terraforming Equipment": 400}},
+        {"id": "research_lab", "name": "Research Laboratory", "tier": 2,
+         "requires": ["high_tech_hub"], "gives": {"tech_level": 30, "standard_of_living": 10},
+         "cost": {"CMM Composite": 500, "Research Data": 400}},
+        {"id": "shipyard_hub", "name": "Shipyard Hub", "tier": 2,
+         "requires": ["industrial_hub"], "gives": {"tech_level": 15, "wealth": 20},
+         "cost": {"CMM Composite": 700, "Aluminium": 500}},
     ],
     "Ground": [
         {"id": "communications_array", "name": "Communications Array", "tier": 1,
@@ -148,6 +160,15 @@ COLONY_FACILITIES = {
         {"id": "barracks", "name": "Barracks", "tier": 2,
          "requires": ["military_installation"], "gives": {"security": 20},
          "cost": {"Military Supplies": 300}},
+        {"id": "farm_complex", "name": "Farm Complex", "tier": 1,
+         "requires": [], "gives": {"population_growth": 15, "standard_of_living": 10},
+         "cost": {"CMM Composite": 300, "Agricultural Supplies": 200}},
+        {"id": "power_plant", "name": "Power Plant", "tier": 1,
+         "requires": [], "gives": {"tech_level": 10, "population_growth": 5},
+         "cost": {"CMM Composite": 400, "Power Generators": 300}},
+        {"id": "water_treatment", "name": "Water Treatment Facility", "tier": 1,
+         "requires": [], "gives": {"standard_of_living": 15, "population_growth": 10},
+         "cost": {"CMM Composite": 350, "Water Purifiers": 250}},
     ]
 }
 
@@ -242,6 +263,8 @@ HTML_TEMPLATE = """
             <button class="tab" onclick="showTab('station')">🏢 Station Info</button>
             <button class="tab" onclick="showTab('resources')">🪐 Resources</button>
             <button class="tab" onclick="showTab('bodies')">🌍 Bodies</button>
+            <button class="tab" onclick="showTab('materials')">🔧 Materials</button>
+            <button class="tab" onclick="showTab('outfitting')">🛠️ Outfitting</button>
             <button class="tab" onclick="showTab('colonize')">🏗️ Colony Advisor</button>
             <button class="tab" onclick="showTab('route')">📍 Trade Routes</button>
         </div>
@@ -336,6 +359,56 @@ HTML_TEMPLATE = """
                 </form>
             </div>
             <div id="bodiesResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- MATERIALS FINDER TAB -->
+        <div id="materials" class="tab-content">
+            <div class="info-box">
+                <strong>🔧 Engineering Materials Finder</strong><br>
+                Search a system for engineering materials or see all materials on landable bodies.
+            </div>
+            <div class="search-box">
+                <form id="materialsForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System Name</label>
+                            <input type="text" id="matSystem" placeholder="e.g. Col 285 Sector HN-R C5-10" oninput="autocompleteSystem(this, 'matSystemList')" required>
+                            <div id="matSystemList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Material (optional)</label>
+                            <input type="text" id="matName" placeholder="e.g. Carbon, Iron, Selenium">
+                        </div>
+                    </div>
+                    <button type="submit">Find Materials</button>
+                </form>
+            </div>
+            <div id="materialsResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- OUTFITTING TAB -->
+        <div id="outfitting" class="tab-content">
+            <div class="info-box">
+                <strong>🛠️ Station Outfitting & Shipyard</strong><br>
+                View modules and ships available at a specific station.
+            </div>
+            <div class="search-box">
+                <form id="outfittingForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System</label>
+                            <input type="text" id="outSystem" placeholder="e.g. Sol" oninput="autocompleteSystem(this, 'outSystemList')" required>
+                            <div id="outSystemList" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Station</label>
+                            <input type="text" id="outStation" placeholder="e.g. Abraham Lincoln" required>
+                        </div>
+                    </div>
+                    <button type="submit">Get Outfitting</button>
+                </form>
+            </div>
+            <div id="outfittingResults" class="results" style="display:none;"></div>
         </div>
 
         <!-- COLONY ADVISOR TAB -->
@@ -719,6 +792,94 @@ HTML_TEMPLATE = """
                     
                     html += '</div>';
                 });
+                
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+        
+        // Materials form
+        document.getElementById('materialsForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('matSystem').value;
+            const material = document.getElementById('matName').value;
+            const results = document.getElementById('materialsResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Scanning for materials...</div>';
+            try {
+                const url = '/api/materials?system=' + encodeURIComponent(system) + (material ? '&material=' + encodeURIComponent(material) : '');
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<div class="info-box"><h2>🔧 ' + data.system + '</h2><div>' + data.body_count + ' bodies scanned';
+                if (data.search_material) html += ' | Searching: <strong>' + data.search_material + '</strong>';
+                html += ' | Found: ' + data.found_count + ' matches</div></div>';
+                
+                if (data.found_count === 0) {
+                    html += '<div class="info-box warning">No materials found. Try a different system or material.</div>';
+                } else {
+                    data.bodies.forEach(b => {
+                        html += '<div class="station-card">' +
+                            '<h4>' + b.name + ' <span style="color:#888;">[' + b.type + ']</span></h4>' +
+                            '<div style="color:#888;">Dist: ' + b.distance.toLocaleString() + 'ls | ';
+                        if (b.gravity) html += 'Gravity: ' + b.gravity.toFixed(2) + 'G | ';
+                        if (b.isLandable) html += '🛬 Landable';
+                        html += '</div>';
+                        if (b.material) {
+                            html += '<div style="margin-top:8px;"><span class="commodity-tag" style="background:#ffa50030;color:#ffa500;font-size:1em;">' + b.material + ': ' + b.percentage + '%</span></div>';
+                        }
+                        if (b.materials) {
+                            html += '<div style="margin-top:8px;">Top Materials: ';
+                            for (const [mat, pct] of Object.entries(b.materials)) {
+                                html += '<span class="commodity-tag">' + mat + ': ' + pct + '%</span> ';
+                            }
+                            html += '</div>';
+                        }
+                        html += '</div>';
+                    });
+                }
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+        
+        // Outfitting form
+        document.getElementById('outfittingForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('outSystem').value;
+            const station = document.getElementById('outStation').value;
+            const results = document.getElementById('outfittingResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Fetching outfitting data...</div>';
+            try {
+                const res = await fetch('/api/outfitting?system=' + encodeURIComponent(system) + '&station=' + encodeURIComponent(station));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<div class="info-box"><h2>🛠️ ' + data.station + ' (' + data.system + ')</h2></div>';
+                
+                html += '<div class="grid"><div class="stat"><div class="stat-value">' + data.module_count + '</div><div class="stat-label">Modules</div></div>' +
+                    '<div class="stat"><div class="stat-value">' + data.ship_count + '</div><div class="stat-label">Ships</div></div></div>';
+                
+                if (data.ship_count > 0) {
+                    html += '<h3>🚀 Ships Available</h3>';
+                    data.ships.forEach(s => {
+                        html += '<span class="commodity-tag" style="background:#00d4ff20;color:#00d4ff;">' + s.name + ' (' + (s.price ? s.price.toLocaleString() + 'cr' : 'N/A') + ')</span> ';
+                    });
+                }
+                
+                if (data.module_count > 0) {
+                    html += '<h3>⚙️ Modules by Category</h3>';
+                    for (const [cat, mods] of Object.entries(data.modules)) {
+                        html += '<div class="station-card"><h4>' + cat + '</h4>';
+                        mods.forEach(m => {
+                            html += '<div style="margin:2px 0;"><span class="commodity-tag">' + m.name + ' (Class ' + m.class + m.rating + ')</span> ' +
+                                (m.price ? '<span style="color:#0f0;">' + m.price.toLocaleString() + 'cr</span>' : '') + '</div>';
+                        });
+                        html += '</div>';
+                    }
+                }
+                
+                if (data.module_count === 0 && data.ship_count === 0) {
+                    html += '<div class="info-box warning">No outfitting or shipyard data available for this station.</div>';
+                }
                 
                 results.innerHTML = html;
             } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
@@ -1210,6 +1371,145 @@ def api_bodies():
         "system": system,
         "body_count": len(body_list),
         "bodies": body_list
+    })
+
+# ===== ENGINEERING MATERIALS FINDER =====
+
+ENGINEERING_MATERIALS = {
+    "Raw": ["Carbon", "Vanadium", "Niobium", "Yttrium", "Phosphorus", "Chromium", "Molybdenum", "Technetium",
+            "Sulphur", "Manganese", "Cadmium", "Ruthenium", "Iron", "Zinc", "Tin", "Selenium",
+            "Nickel", "Germanium", "Tungsten", "Antimony", "Rhenium", "Arsenic", "Mercury", "Polonium",
+            "Lead", "Zirconium", "Boron", "Tellurium"],
+    "Manufactured": ["Chemical Processors", "Chemical Storage Units", "Chemical Distillery", "Pharmaceutical Isolators",
+                       "Conductive Components", "Conductive Ceramics", "Conductive Polymers", "Polymer Capacitors",
+                       "Mechanical Components", "Mechanical Equipment", "Mechanical Scrap", "Configurable Components",
+                       "Shield Emitters", "Shielding Sensors", "Compound Shielding", "Imperial Shielding",
+                       "Filament Composites", "High Density Composites", "Proprietary Composites", "Core Dynamics Composites",
+                       "Heat Conduction Wiring", "Heat Dispersion Plate", "Heat Exchangers", "Heat Vanes",
+                       "Worn Shield Emitters", "Untypical Shield Scans", "Aberrant Shield Pattern Analysis", "Peculiar Shield Data",
+                       "Grid Resistors", "Hybrid Capacitors", "Electrochemical Arrays", "Exquisite Focus Crystals",
+                       "Salvaged Alloys", "Galvanising Alloys", "Phase Alloys", "Proto Light Alloys", "Proto Radiolic Alloys",
+                       "Compact Composites", "Filament Composites", "High Density Composites", "Proprietary Composites",
+                       "Crystal Shards", "Flawed Focus Crystals", "Focus Crystals", "Refined Focus Crystals"],
+    "Encoded": ["Anomalous Bulk Scan Data", "Atypical Disrupted Wake Echoes", "Atypical Encryption Archives",
+                "Classified Scan Databanks", "Classified Scan Fragment", "Cracked Industrial Firmware",
+                "Datamined Wake Exceptions", "Decoded Emission Data", "Divergent Scan Data", "Eccentric Hyperspace Trajectories",
+                "Exceptional Scrambled Emission Data", "Inconsistent Shield Soak Analysis", "Irregular Emission Data",
+                "Modified Consumer Firmware", "Modified Embedded Firmware", "Open Symmetric Keys",
+                "Security Firmware Patch", "Specialised Legacy Firmware", "Strange Wake Solutions",
+                "Tagged Encryption Codes", "Unusual Encrypted Files", "Untypical Shield Scans"]
+}
+
+@app.route('/api/materials')
+def api_materials():
+    """Find engineering materials in a system."""
+    system = request.args.get('system', '')
+    material = request.args.get('material', '')
+    
+    if not system:
+        return jsonify({"error": "System name required"})
+    
+    bodies = fetch_bodies(system)
+    if not bodies:
+        return jsonify({"error": "No body data found for " + system})
+    
+    found_bodies = []
+    for body in bodies:
+        materials = body.get("materials", {})
+        if material:
+            # Search for specific material
+            if material.lower() in {k.lower(): v for k, v in materials.items()}:
+                pct = next((v for k, v in materials.items() if k.lower() == material.lower()), 0)
+                found_bodies.append({
+                    "name": body.get("name", "Unknown"),
+                    "type": body.get("subType", "Unknown"),
+                    "material": material,
+                    "percentage": pct,
+                    "distance": body.get("distanceToArrival", 0),
+                    "isLandable": body.get("isLandable", False),
+                    "gravity": body.get("gravity", 0)
+                })
+        else:
+            # Show all materials on this body
+            if materials:
+                found_bodies.append({
+                    "name": body.get("name", "Unknown"),
+                    "type": body.get("subType", "Unknown"),
+                    "materials": {k: v for k, v in sorted(materials.items(), key=lambda x: x[1], reverse=True)[:5]},
+                    "distance": body.get("distanceToArrival", 0),
+                    "isLandable": body.get("isLandable", False)
+                })
+    
+    if material:
+        found_bodies.sort(key=lambda x: x["percentage"], reverse=True)
+    
+    return jsonify({
+        "system": system,
+        "search_material": material,
+        "body_count": len(bodies),
+        "found_count": len(found_bodies),
+        "bodies": found_bodies
+    })
+
+# ===== STATION OUTFITTING DETAILS =====
+
+def get_station_outfitting(system, station):
+    """Fetch outfitting details for a station."""
+    url = f"{EDSM_API}/api-system-v1/stations/outfitting?systemName={urllib.parse.quote(system)}&stationName={urllib.parse.quote(station)}"
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read().decode())
+            return data
+    except Exception as e:
+        return {"error": str(e)}
+
+def get_station_shipyard(system, station):
+    """Fetch shipyard details for a station."""
+    url = f"{EDSM_API}/api-system-v1/stations/shipyard?systemName={urllib.parse.quote(system)}&stationName={urllib.parse.quote(station)}"
+    req = urllib.request.Request(url, headers=REQUEST_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read().decode())
+            return data
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.route('/api/outfitting')
+def api_outfitting():
+    """Get detailed outfitting and shipyard info for a station."""
+    system = request.args.get('system', '')
+    station = request.args.get('station', '')
+    
+    if not system or not station:
+        return jsonify({"error": "Both system and station names required"})
+    
+    outfitting = get_station_outfitting(system, station)
+    shipyard = get_station_shipyard(system, station)
+    
+    modules = outfitting.get("modules", []) if not outfitting.get("error") else []
+    ships = shipyard.get("ships", []) if not shipyard.get("error") else []
+    
+    # Categorize modules
+    module_categories = {}
+    for mod in modules:
+        cat = mod.get("category", "Other")
+        if cat not in module_categories:
+            module_categories[cat] = []
+        module_categories[cat].append({
+            "name": mod.get("name", "Unknown"),
+            "class": mod.get("class", "?"),
+            "rating": mod.get("rating", "?"),
+            "price": mod.get("price", 0)
+        })
+    
+    return jsonify({
+        "system": system,
+        "station": station,
+        "modules": module_categories,
+        "module_count": len(modules),
+        "ships": [{"name": s.get("name", "Unknown"), "price": s.get("price", 0)} for s in ships],
+        "ship_count": len(ships)
     })
 
 if __name__ == '__main__':
