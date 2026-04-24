@@ -241,6 +241,7 @@ HTML_TEMPLATE = """
             <button class="tab active" onclick="showTab('trade')">🔍 Trade Search</button>
             <button class="tab" onclick="showTab('station')">🏢 Station Info</button>
             <button class="tab" onclick="showTab('resources')">🪐 Resources</button>
+            <button class="tab" onclick="showTab('bodies')">🌍 Bodies</button>
             <button class="tab" onclick="showTab('colonize')">🏗️ Colony Advisor</button>
             <button class="tab" onclick="showTab('route')">📍 Trade Routes</button>
         </div>
@@ -314,6 +315,27 @@ HTML_TEMPLATE = """
                 </form>
             </div>
             <div id="resourcesResults" class="results" style="display:none;"></div>
+        </div>
+
+        <!-- BODIES TAB -->
+        <div id="bodies" class="tab-content">
+            <div class="info-box">
+                <strong>🌍 Body Explorer</strong><br>
+                Explore every celestial body in the system with detailed stats and per-body build recommendations.
+            </div>
+            <div class="search-box">
+                <form id="bodiesForm">
+                    <div class="form-row">
+                        <div class="form-group autocomplete">
+                            <label>System Name</label>
+                            <input type="text" id="bodiesSystem" placeholder="e.g. Col 285 Sector HN-R C5-10" oninput="autocompleteSystem(this, 'bodiesSystemList')" required>
+                            <div id="bodiesSystemList" class="autocomplete-list"></div>
+                        </div>
+                    </div>
+                    <button type="submit">Explore Bodies</button>
+                </form>
+            </div>
+            <div id="bodiesResults" class="results" style="display:none;"></div>
         </div>
 
         <!-- COLONY ADVISOR TAB -->
@@ -640,6 +662,64 @@ HTML_TEMPLATE = """
                 } else {
                     html += '<div class="info-box warning">No station data found for route. Try EDSM directly.</div>';
                 }
+                results.innerHTML = html;
+            } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
+        };
+        // Bodies form
+        document.getElementById('bodiesForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const system = document.getElementById('bodiesSystem').value;
+            const results = document.getElementById('bodiesResults');
+            results.style.display = 'block';
+            results.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Scanning system bodies...</div>';
+            try {
+                const res = await fetch('/api/bodies?system=' + encodeURIComponent(system));
+                const data = await res.json();
+                if (data.error) { results.innerHTML = '<div style="color:#f55;text-align:center;">' + data.error + '</div>'; return; }
+                let html = '<div class="info-box"><h2>🌍 ' + data.system + ' — ' + data.body_count + ' Bodies</h2></div>';
+                
+                data.bodies.forEach(b => {
+                    const typeColor = b.class === 'star' ? '#ff6b6b' : b.class === 'mineral' ? '#ffa500' : b.class === 'volatile' ? '#00d4ff' : b.class === 'gas' ? '#888' : b.class === 'organic' ? '#4ecdc4' : b.class === 'belt' ? '#ff6b6b' : '#888';
+                    html += '<div class="station-card" style="border-left-color:' + typeColor + '">' +
+                        '<h4>' + b.name + ' <span style="color:' + typeColor + ';">[' + b.subtype + ']</span></h4>' +
+                        '<div style="color:#888;">';
+                    if (b.distance > 0) html += 'Dist: ' + b.distance.toLocaleString() + 'ls | ';
+                    if (b.gravity > 0) html += 'Gravity: ' + b.gravity.toFixed(2) + 'G | ';
+                    if (b.temperature > 0) html += 'Temp: ' + b.temperature.toFixed(0) + 'K | ';
+                    html += 'Atmo: ' + b.atmosphere;
+                    if (b.volcanism !== 'None') html += ' | 🔥 Volcanic';
+                    if (b.isLandable) html += ' | 🛬 Landable';
+                    if (b.terraformable) html += ' | 🌍 Terraformable';
+                    html += '</div>';
+                    
+                    if (b.rings.length > 0) {
+                        html += '<div style="margin:5px 0;">Rings: ';
+                        b.rings.forEach(r => {
+                            const rcolor = r === 'metallic' ? '#ffa500' : r === 'pristine' ? '#00ff00' : '#888';
+                            html += '<span class="commodity-tag" style="background:' + rcolor + '20;color:' + rcolor + ';">' + r + '</span> ';
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (Object.keys(b.materials).length > 0) {
+                        html += '<div style="margin:5px 0;">Materials: ';
+                        for (const [mat, pct] of Object.entries(b.materials).slice(0, 6)) {
+                            html += '<span class="commodity-tag" style="background:#1a4a5e;">' + mat + ': ' + pct + '%</span> ';
+                        }
+                        html += '</div>';
+                    }
+                    
+                    html += '<div style="margin-top:8px;"><strong>Recommended Builds:</strong></div>';
+                    b.recommendations.forEach(rec => {
+                        const locColor = rec.type === 'Orbital' ? '#00d4ff' : '#4ecdc4';
+                        html += '<div style="margin:3px 0;padding:5px;background:rgba(0,0,0,0.2);border-radius:4px;">' +
+                            '<span style="color:' + locColor + ';font-weight:bold;">[' + rec.type + ']</span> ' +
+                            rec.name + ' — <span style="color:#888;">' + rec.reason + '</span></div>';
+                    });
+                    
+                    html += '</div>';
+                });
+                
                 results.innerHTML = html;
             } catch (err) { results.innerHTML = '<div style="color:#f55;text-align:center;">Error: ' + err.message + '</div>'; }
         };
@@ -1006,6 +1086,130 @@ def api_resources():
              "priority": "High" if s >= 8 else "Medium" if s >= 4 else "Low"}
             for f, s in ranked if s > 0
         ]
+    })
+
+@app.route('/api/bodies')
+def api_bodies():
+    """Return detailed body list with per-body facility recommendations."""
+    system = request.args.get('system', '')
+    if not system:
+        return jsonify({"error": "System name required"})
+    bodies = fetch_bodies(system)
+    if not bodies:
+        return jsonify({"error": "No body data found for " + system})
+    
+    body_list = []
+    for body in bodies:
+        btype = body.get("type", "")
+        subtype = body.get("subType", "")
+        name = body.get("name", "Unknown")
+        
+        # Determine body class and recommendations
+        body_class = "unknown"
+        facility_recs = []
+        
+        st = subtype.lower()
+        if "star" in st:
+            body_class = "star"
+            facility_recs = [{"type": "Orbital", "name": "Solar Array", "reason": "Proximity to star for solar power"}]
+        elif "metallic" in st or "metal rich" in st:
+            body_class = "mineral"
+            facility_recs = [
+                {"type": "Orbital", "name": "Extraction Hub", "reason": "High mineral content"},
+                {"type": "Ground", "name": "Mining Outpost", "reason": "Surface mining operations"},
+                {"type": "Orbital", "name": "Refinery Hub", "reason": "Process extracted metals"}
+            ]
+        elif "rocky" in st and "body" in st:
+            body_class = "rocky"
+            facility_recs = [
+                {"type": "Ground", "name": "Mining Outpost", "reason": "Medium mineral content"},
+                {"type": "Ground", "name": "Industrial Hub", "reason": "Manufacturing base"}
+            ]
+        elif "icy" in st:
+            body_class = "volatile"
+            facility_recs = [
+                {"type": "Ground", "name": "Ice Refinery", "reason": "Water/ice extraction"},
+                {"type": "Orbital", "name": "Refinery Hub", "reason": "Process volatiles into fuel"},
+                {"type": "Ground", "name": "Life Support Outpost", "reason": "Water source for colony"}
+            ]
+        elif "water world" in st or "water giant" in st:
+            body_class = "water"
+            facility_recs = [
+                {"type": "Orbital", "name": "Water Extraction Platform", "reason": "Abundant water supply"},
+                {"type": "Ground", "name": "Aquaponics Farm", "reason": "Water-based agriculture"}
+            ]
+        elif "earth-like" in st:
+            body_class = "organic"
+            facility_recs = [
+                {"type": "Ground", "name": "Agricultural Hub", "reason": "Earth-like conditions for farming"},
+                {"type": "Ground", "name": "Biosphere Research", "reason": "Study native ecosystem"},
+                {"type": "Orbital", "name": "Trading Hub", "reason": "Export organic goods"}
+            ]
+        elif "ammonia world" in st:
+            body_class = "organic"
+            facility_recs = [
+                {"type": "Ground", "name": "Chemical Processing Plant", "reason": "Ammonia-based chemicals"},
+                {"type": "Ground", "name": "Agricultural Hub", "reason": "Terraformed agriculture potential"}
+            ]
+        elif "gas giant" in st:
+            body_class = "gas"
+            facility_recs = [
+                {"type": "Orbital", "name": "Gas Extraction Platform", "reason": "Hydrogen/helium harvesting"},
+                {"type": "Orbital", "name": "Refinery Hub", "reason": "Process gas into fuel"},
+                {"type": "Orbital", "name": "Industrial Hub", "reason": "Gas-based manufacturing"}
+            ]
+        elif body.get("type") == "Belt":
+            body_class = "belt"
+            facility_recs = [
+                {"type": "Orbital", "name": "Asteroid Mining Station", "reason": "Rich asteroid field"},
+                {"type": "Orbital", "name": "Extraction Hub", "reason": "Bulk resource extraction"}
+            ]
+        
+        # Check terraformable
+        is_terraformable = False
+        if body.get("terraformingState") and body["terraformingState"] != "Not terraformable":
+            is_terraformable = True
+        elif body.get("isLandable") and body.get("atmosphereType") in ["Thin", "Marginal"]:
+            is_terraformable = True
+        
+        if is_terraformable:
+            facility_recs.insert(0, {"type": "Ground", "name": "Terraforming Station", "reason": "Candidate for terraforming"})
+        
+        # Check rings
+        rings = []
+        if body.get("rings"):
+            for ring in body["rings"]:
+                rtype = ring.get("type", "").lower()
+                if "metallic" in rtype:
+                    rings.append("metallic")
+                    facility_recs.append({"type": "Orbital", "name": "Ring Mining Station", "reason": "Metallic ring mining"})
+                elif "pristine" in rtype:
+                    rings.append("pristine")
+                    facility_recs.append({"type": "Orbital", "name": "Deep Mining Platform", "reason": "Pristine reserves (50% yield)"})
+                else:
+                    rings.append("standard")
+        
+        body_list.append({
+            "name": name,
+            "type": btype,
+            "subtype": subtype,
+            "class": body_class,
+            "distance": body.get("distanceToArrival", 0),
+            "isLandable": body.get("isLandable", False),
+            "gravity": body.get("gravity", 0),
+            "temperature": body.get("surfaceTemperature", 0),
+            "atmosphere": body.get("atmosphereType", "None"),
+            "volcanism": body.get("volcanismType", "None"),
+            "terraformable": is_terraformable,
+            "rings": rings,
+            "materials": body.get("materials", {}),
+            "recommendations": facility_recs[:4]  # Top 4 recommendations
+        })
+    
+    return jsonify({
+        "system": system,
+        "body_count": len(body_list),
+        "bodies": body_list
     })
 
 if __name__ == '__main__':
