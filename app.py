@@ -708,64 +708,64 @@ HTML_TEMPLATE = """
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Trade & Station</div>
-        <div class="nav-item active" onclick="showPage('trade')">
+        <div class="nav-item active" onclick="showPage(event, 'trade')">
             <span class="icon">🔍</span><span class="label">Trade Search</span>
         </div>
-        <div class="nav-item" onclick="showPage('station')">
+        <div class="nav-item" onclick="showPage(event, 'station')">
             <span class="icon">🏢</span><span class="label">Station Info</span>
         </div>
-        <div class="nav-item" onclick="showPage('route')">
+        <div class="nav-item" onclick="showPage(event, 'route')">
             <span class="icon">📍</span><span class="label">Trade Routes</span>
         </div>
-        <div class="nav-item" onclick="showPage('services')">
+        <div class="nav-item" onclick="showPage(event, 'services')">
             <span class="icon">🔧</span><span class="label">Service Finder</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Tools</div>
-        <div class="nav-item" onclick="showPage('states')">
+        <div class="nav-item" onclick="showPage(event, 'states')">
             <span class="icon">📊</span><span class="label">System States</span>
         </div>
-        <div class="nav-item" onclick="showPage('engineering')">
+        <div class="nav-item" onclick="showPage(event, 'engineering')">
             <span class="icon">⚙️</span><span class="label">Engineering</span>
         </div>
-        <div class="nav-item" onclick="showPage('colonize')">
+        <div class="nav-item" onclick="showPage(event, 'colonize')">
             <span class="icon">🏗️</span><span class="label">Colony Advisor</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Exploration</div>
-        <div class="nav-item" onclick="showPage('guardian')">
+        <div class="nav-item" onclick="showPage(event, 'guardian')">
             <span class="icon">👽</span><span class="label">Guardian Sites</span>
         </div>
-        <div class="nav-item" onclick="showPage('thargoid')">
+        <div class="nav-item" onclick="showPage(event, 'thargoid')">
             <span class="icon">🛸</span><span class="label">Thargoid Sites</span>
         </div>
-        <div class="nav-item" onclick="showPage('carrier')">
+        <div class="nav-item" onclick="showPage(event, 'carrier')">
             <span class="icon">🚀</span><span class="label">Fleet Carriers</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Integration</div>
-        <div class="nav-item" onclick="showPage('inara')">
+        <div class="nav-item" onclick="showPage(event, 'inara')">
             <span class="icon">🔗</span><span class="label">Inara.cz</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Commander</div>
-        <div class="nav-item" onclick="showPage('commander')">
+        <div class="nav-item" onclick="showPage(event, 'commander')">
             <span class="icon">👤</span><span class="label">Dashboard</span>
         </div>
-        <div class="nav-item" onclick="showPage('colonies')">
+        <div class="nav-item" onclick="showPage(event, 'colonies')">
             <span class="icon">🏰</span><span class="label">My Colonies</span>
         </div>
-        <div class="nav-item" onclick="showPage('ships')">
+        <div class="nav-item" onclick="showPage(event, 'ships')">
             <span class="icon">🚀</span><span class="label">Ship Hangar</span>
         </div>
-        <div class="nav-item" onclick="showPage('materials')">
+        <div class="nav-item" onclick="showPage(event, 'materials')">
             <span class="icon">📦</span><span class="label">Materials</span>
         </div>
-        <div class="nav-item" onclick="showPage('bookmarks')">
+        <div class="nav-item" onclick="showPage(event, 'bookmarks')">
             <span class="icon">⭐</span><span class="label">Bookmarks</span>
         </div>
     </div>
@@ -1542,7 +1542,7 @@ HTML_TEMPLATE = """
 
 <script>
 // Navigation
-function showPage(pageId) {
+function showPage(event, pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pageId).classList.add('active');
@@ -2131,13 +2131,13 @@ function quickAction(action) {
         case 'nearest-material-trader':
             document.getElementById('service-system').value = location;
             document.getElementById('service-type').value = 'Material Trader';
-            showPage('services');
+            showPage(new Event('click'), 'services');
             searchServices();
             return;
         case 'nearest-tech-broker':
             document.getElementById('service-system').value = location;
             document.getElementById('service-type').value = 'Technology Broker';
-            showPage('services');
+            showPage(new Event('click'), 'services');
             searchServices();
             return;
     }
