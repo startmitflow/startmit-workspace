@@ -1263,11 +1263,11 @@ HTML_TEMPLATE = """
         <div class="form-grid">
             <div class="form-group">
                 <label>System Name</label>
-                <input type="text" id="colony-system" placeholder="e.g. Beta Hydri">
+                <input type="text" id="colony-add-system" placeholder="e.g. Beta Hydri">
             </div>
             <div class="form-group">
                 <label>Station Name</label>
-                <input type="text" id="colony-station" placeholder="e.g. Markov Station">
+                <input type="text" id="colony-add-station" placeholder="e.g. Markov Station">
             </div>
             <div class="form-group">
                 <label>Station Type</label>
@@ -2146,8 +2146,8 @@ function quickAction(action) {
 
 // ===== COLONIES =====
 function addColony() {
-    const system = document.getElementById('colony-system').value;
-    const station = document.getElementById('colony-station').value;
+    const system = document.getElementById('colony-add-system').value;
+    const station = document.getElementById('colony-add-station').value;
     const type = document.getElementById('colony-type').value;
     
     if (!system) { alert('Please enter system name'); return; }
@@ -2167,8 +2167,8 @@ function addColony() {
     });
     
     localStorage.setItem('elite_colonies', JSON.stringify(colonies));
-    document.getElementById('colony-system').value = '';
-    document.getElementById('colony-station').value = '';
+    document.getElementById('colony-add-system').value = '';
+    document.getElementById('colony-add-station').value = '';
     renderColonies();
     logActivity(`Colony added: ${system}`);
     alert('Colony added!');
