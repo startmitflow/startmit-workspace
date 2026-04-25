@@ -709,40 +709,40 @@ HTML_TEMPLATE = """
     <div class="nav-section">
         <div class="nav-section-title">Trade & Station</div>
         <div class="nav-item active" onclick="showPage(event, 'trade')">
-            <span class="icon">ðŸ”</span><span class="label">Trade Search</span>
+            <span class="icon">🚚</span><span class="label">Trade Search</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'station')">
-            <span class="icon">ðŸ¢</span><span class="label">Station Info</span>
+            <span class="icon">📍</span><span class="label">Station Info</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'route')">
-            <span class="icon">ðŸ“</span><span class="label">Trade Routes</span>
+            <span class="icon">⚡</span><span class="label">Trade Routes</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'services')">
-            <span class="icon">ðŸ”§</span><span class="label">Service Finder</span>
+            <span class="icon">🏢</span><span class="label">Service Finder</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Tools</div>
         <div class="nav-item" onclick="showPage(event, 'states')">
-            <span class="icon">ðŸ“Š</span><span class="label">System States</span>
+            <span class="icon">📈</span><span class="label">System States</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'engineering')">
-            <span class="icon">âš™ï¸</span><span class="label">Engineering</span>
+            <span class="icon">🔧</span><span class="label">Engineering</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'colonize')">
-            <span class="icon">ðŸ—ï¸</span><span class="label">Colony Advisor</span>
+            <span class="icon">🏗️</span><span class="label">Colony Advisor</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Exploration</div>
         <div class="nav-item" onclick="showPage(event, 'guardian')">
-            <span class="icon">ðŸ‘½</span><span class="label">Guardian Sites</span>
+            <span class="icon">🛸</span><span class="label">Guardian Sites</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'thargoid')">
-            <span class="icon">ðŸ›¸</span><span class="label">Thargoid Sites</span>
+            <span class="icon">🚀</span><span class="label">Thargoid Sites</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'carrier')">
-            <span class="icon">ðŸš€</span><span class="label">Fleet Carriers</span>
+            <span class="icon">⛽</span><span class="label">Fleet Carriers</span>
         </div>
     </div>
     
