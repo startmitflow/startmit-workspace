@@ -783,11 +783,11 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>System</label>
+                <label for="trade-system">System</label>
                 <input type="text" id="trade-system" placeholder="e.g. Sol, Lave, Diaguandi">
             </div>
             <div class="form-group">
-                <label>Commodity</label>
+                <label for="trade-commodity">Commodity</label>
                 <input type="text" id="trade-commodity" placeholder="e.g. Gold, Tritium, Food">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -813,7 +813,7 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>System Name</label>
+                <label for="station-system">System Name</label>
                 <input type="text" id="station-system" placeholder="e.g. Sol, Col 285 Sector">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -838,11 +838,11 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>From System</label>
+                <label for="route-from">From System</label>
                 <input type="text" id="route-from" placeholder="e.g. Sol">
             </div>
             <div class="form-group">
-                <label>To System</label>
+                <label for="route-to">To System</label>
                 <input type="text" id="route-to" placeholder="e.g. Lave">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -870,11 +870,11 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>Center System</label>
+                <label for="service-system">Center System</label>
                 <input type="text" id="service-system" placeholder="e.g. Sol">
             </div>
             <div class="form-group">
-                <label>Service Type</label>
+                <label for="service-type">Service Type</label>
                 <select id="service-type">
                     <option value="Material Trader">Material Trader</option>
                     <option value="Technology Broker">Technology Broker</option>
@@ -910,7 +910,7 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>System Name</label>
+                <label for="state-system">System Name</label>
                 <input type="text" id="state-system" placeholder="e.g. Diaguandi, Orrere">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -950,7 +950,7 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>Module Type</label>
+                <label for="eng-module">Module Type</label>
                 <select id="eng-module" onchange="updateBlueprints()">
                     <option value="FSD Range">FSD Range</option>
                     <option value="Shield Boost">Shield Boost</option>
@@ -960,7 +960,7 @@ HTML_TEMPLATE = """
                 </select>
             </div>
             <div class="form-group">
-                <label>Blueprint</label>
+                <label for="eng-blueprint">Blueprint</label>
                 <select id="eng-blueprint"></select>
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -989,11 +989,11 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>System</label>
+                <label for="colony-system">System</label>
                 <input type="text" id="colony-system" placeholder="e.g. Beta Hydri">
             </div>
             <div class="form-group">
-                <label>Goal</label>
+                <label for="colony-goal">Goal</label>
                 <select id="colony-goal">
                     <option value="balanced">Balanced</option>
                     <option value="tech">Tech Focus</option>
@@ -1065,7 +1065,7 @@ HTML_TEMPLATE = """
     <div class="card">
         <div class="form-grid">
             <div class="form-group">
-                <label>Search Term</label>
+                <label for="carrier-search">Search Term</label>
                 <input type="text" id="carrier-search" placeholder="Carrier name or ID">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -1102,7 +1102,7 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">API Configuration</span></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Inara API Key</label>
+                <label for="inara-key">Inara API Key</label>
                 <input type="password" id="inara-key" placeholder="Your Inara API key">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -1168,29 +1168,29 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">Commander Profile</span></div>
         <div class="form-grid" style="margin-bottom:15px;">
             <div class="form-group">
-                <label>Commander Name (CMDR)</label>
+                <label for="cmdr-name">Commander Name (CMDR)</label>
                 <input type="text" id="cmdr-name" placeholder="Your CMDR name">
             </div>
             <div class="form-group">
-                <label>Current Ship</label>
+                <label for="cmdr-ship">Current Ship</label>
                 <input type="text" id="cmdr-ship" placeholder="e.g. Anaconda, Corvette">
             </div>
             <div class="form-group">
-                <label>Home System</label>
+                <label for="cmdr-home">Home System</label>
                 <input type="text" id="cmdr-home" placeholder="e.g. Sol, Diaguandi">
             </div>
             <div class="form-group">
-                <label>Current Location</label>
+                <label for="cmdr-location">Current Location</label>
                 <input type="text" id="cmdr-location" placeholder="Current system">
             </div>
         </div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Credits (CR)</label>
+                <label for="cmdr-credits">Credits (CR)</label>
                 <input type="text" id="cmdr-credits" placeholder="e.g. 1,500,000,000">
             </div>
             <div class="form-group">
-                <label>Ranks (Combat/Trade/Explore)</label>
+                <label for="cmdr-ranks">Ranks (Combat/Trade/Explore)</label>
                 <input type="text" id="cmdr-ranks" placeholder="e.g. Expert/Master/Elite">
             </div>
         </div>
@@ -1262,15 +1262,15 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">Add Colonized System</span></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>System Name</label>
+                <label for="colony-add-system">System Name</label>
                 <input type="text" id="colony-add-system" placeholder="e.g. Beta Hydri">
             </div>
             <div class="form-group">
-                <label>Station Name</label>
+                <label for="colony-add-station">Station Name</label>
                 <input type="text" id="colony-add-station" placeholder="e.g. Markov Station">
             </div>
             <div class="form-group">
-                <label>Station Type</label>
+                <label for="colony-type">Station Type</label>
                 <select id="colony-type">
                     <option value="Orbital Station">Orbital Station</option>
                     <option value=" planetary Outpost">Planetary Outpost</option>
@@ -1295,7 +1295,7 @@ HTML_TEMPLATE = """
         
         <div class="form-grid" style="margin-bottom:15px;">
             <div class="form-group">
-                <label>Built Facilities</label>
+                <label for="colony-facilities">Built Facilities</label>
                 <div id="colony-facilities" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
             </div>
         </div>
@@ -1303,7 +1303,7 @@ HTML_TEMPLATE = """
         <h4 style="color:var(--cyan);margin:15px 0 10px;">Add Facility</h4>
         <div class="form-grid">
             <div class="form-group">
-                <label>Facility Type</label>
+                <label for="add-facility">Facility Type</label>
                 <select id="add-facility">
                     <option value="High Tech Hub">High Tech Hub</option>
                     <option value="Industrial Hub">Industrial Hub</option>
@@ -1342,11 +1342,11 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">Add Ship</span></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Ship Type</label>
+                <label for="ship-name">Ship Type</label>
                 <input type="text" id="ship-name" placeholder="e.g. Anaconda, Python, Krait Phantom">
             </div>
             <div class="form-group">
-                <label>Role</label>
+                <label for="ship-role">Role</label>
                 <select id="ship-role">
                     <option value="Combat">Combat</option>
                     <option value="Trading">Trading</option>
@@ -1358,7 +1358,7 @@ HTML_TEMPLATE = """
                 </select>
             </div>
             <div class="form-group">
-                <label>Build Status</label>
+                <label for="ship-build">Build Status</label>
                 <select id="ship-build">
                     <option value="Stock">Stock</option>
                     <option value="Partial">Partial Engineering</option>
@@ -1386,11 +1386,11 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">Add Material</span></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Material Name</label>
+                <label for="mat-name">Material Name</label>
                 <input type="text" id="mat-name" placeholder="e.g. Phosphorus, Encoded, Micro Controllers">
             </div>
             <div class="form-group">
-                <label>Type</label>
+                <label for="mat-type">Type</label>
                 <select id="mat-type">
                     <option value="Raw">Raw</option>
                     <option value="Encoded">Encoded</option>
@@ -1398,11 +1398,11 @@ HTML_TEMPLATE = """
                 </select>
             </div>
             <div class="form-group">
-                <label>Quantity</label>
+                <label for="mat-qty">Quantity</label>
                 <input type="number" id="mat-qty" placeholder="e.g. 27" value="1">
             </div>
             <div class="form-group">
-                <label>Grade (1-5)</label>
+                <label for="mat-grade">Grade (1-5)</label>
                 <select id="mat-grade">
                     <option value="1">Grade 1</option>
                     <option value="2">Grade 2</option>
@@ -1448,7 +1448,7 @@ HTML_TEMPLATE = """
         <div class="card-header"><span class="card-title">Add Bookmark</span></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Type</label>
+                <label for="bm-type">Type</label>
                 <select id="bm-type">
                     <option value="System">System</option>
                     <option value="Station">Station</option>
@@ -1459,15 +1459,15 @@ HTML_TEMPLATE = """
                 </select>
             </div>
             <div class="form-group">
-                <label>Name</label>
+                <label for="bm-name">Name</label>
                 <input type="text" id="bm-name" placeholder="Bookmark name">
             </div>
             <div class="form-group">
-                <label>Location / System</label>
+                <label for="bm-location">Location / System</label>
                 <input type="text" id="bm-location" placeholder="e.g. Core Dynamics, Sol">
             </div>
             <div class="form-group">
-                <label>Notes</label>
+                <label for="bm-notes">Notes</label>
                 <input type="text" id="bm-notes" placeholder="Optional notes">
             </div>
         </div>
