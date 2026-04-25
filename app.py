@@ -1120,6 +1120,7 @@ HTML_TEMPLATE = """
             <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Fetch your commander profile, ranks, ships, and materials directly from Inara.cz. Make sure your CMDR name matches exactly.</p>
             <div class="form-grid">
                 <div class="form-group">
+                    <label for="inara-cmdr">CMDR Name</label>
                     <input type="text" id="inara-cmdr" placeholder="CMDR Name (must match Inara)">
                 </div>
                 <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -1235,7 +1236,7 @@ HTML_TEMPLATE = """
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
             <button class="secondary" onclick="exportData()">📤 Export All Data</button>
             <button class="secondary" onclick="document.getElementById('import-file').click()">📥 Import Data</button>
-            <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+            <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)" aria-label="Import data from JSON file">
             <button class="secondary" onclick="clearAllData()" style="border-color:var(--red);color:var(--red);">🗑️ Clear All</button>
         </div>
         <p style="color:var(--text-dim);font-size:0.8em;margin-top:10px;">
@@ -1431,6 +1432,7 @@ HTML_TEMPLATE = """
         <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Materials you need to gather for your next engineering goal</p>
         <div id="shopping-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         <div style="margin-top:10px;">
+            <label for="shopping-mat" style="display:none;">Add material</label>
             <input type="text" id="shopping-mat" placeholder="Add to shopping list..." style="max-width:200px;">
             <button class="secondary" onclick="addToShopping()">Add</button>
         </div>
