@@ -2544,7 +2544,7 @@ function clearAllData() {
     logActivity('All data cleared');
 }
 
-// ===== INARA API INTEGRATION =====
+// ===== INARA API INTEGRATION ===== [v11-fix]
 let inaraSyncedData = null;
 
 async function syncInara() {
