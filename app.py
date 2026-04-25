@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, jsonify
+﻿from flask import Flask, render_template_string, request, jsonify
 import urllib.request
 import json
 import urllib.parse
@@ -111,7 +111,7 @@ COMMODITIES = [
     "Tritium Ore", "Tuned Thrusters", "U2 CFC Foils", "Ultra-Compact Fabricators",
     "Underground Games Data", "Unexploded Ordnance", "Uraninite", "Uranium",
     "Utopian Economy Subs", "Valuable Element", "Vegan Junk Food", "Vegetables",
-    "Vehicle Accessories", "Vegan Prosthetics", "Vemineral Subliment 6", "Veny，炒米",
+    "Vehicle Accessories", "Vegan Prosthetics", "Vemineral Subliment 6", "Venyï¼Œç‚’ç±³",
     "Vesta Corp H2O", "Victualis L Brdy 4", "Vinyl Flooring", "Violence Data",
     "Vital CLS Data", "Void Extract Coffee", "Void Herbs", "War EFFect Data",
     "Warped Fit To Data", "Waste", "Waste Equipment", "Water", "Water Purifiers",
@@ -703,72 +703,54 @@ HTML_TEMPLATE = """
 <!-- SIDEBAR NAV -->
 <nav class="sidebar">
     <div class="sidebar-header">
-        <h1>🚀 Elite Station Advisor</h1>
+        <h1>ðŸš€ Elite Station Advisor</h1>
         <span>by StartMit</span>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Trade & Station</div>
         <div class="nav-item active" onclick="showPage(event, 'trade')">
-            <span class="icon">🔍</span><span class="label">Trade Search</span>
+            <span class="icon">ðŸ”</span><span class="label">Trade Search</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'station')">
-            <span class="icon">🏢</span><span class="label">Station Info</span>
+            <span class="icon">ðŸ¢</span><span class="label">Station Info</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'route')">
-            <span class="icon">📍</span><span class="label">Trade Routes</span>
+            <span class="icon">ðŸ“</span><span class="label">Trade Routes</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'services')">
-            <span class="icon">🔧</span><span class="label">Service Finder</span>
+            <span class="icon">ðŸ”§</span><span class="label">Service Finder</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Tools</div>
         <div class="nav-item" onclick="showPage(event, 'states')">
-            <span class="icon">📊</span><span class="label">System States</span>
+            <span class="icon">ðŸ“Š</span><span class="label">System States</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'engineering')">
-            <span class="icon">⚙️</span><span class="label">Engineering</span>
+            <span class="icon">âš™ï¸</span><span class="label">Engineering</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'colonize')">
-            <span class="icon">🏗️</span><span class="label">Colony Advisor</span>
+            <span class="icon">ðŸ—ï¸</span><span class="label">Colony Advisor</span>
         </div>
     </div>
     <div class="nav-section">
         <div class="nav-section-title">Exploration</div>
         <div class="nav-item" onclick="showPage(event, 'guardian')">
-            <span class="icon">👽</span><span class="label">Guardian Sites</span>
+            <span class="icon">ðŸ‘½</span><span class="label">Guardian Sites</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'thargoid')">
-            <span class="icon">🛸</span><span class="label">Thargoid Sites</span>
+            <span class="icon">ðŸ›¸</span><span class="label">Thargoid Sites</span>
         </div>
         <div class="nav-item" onclick="showPage(event, 'carrier')">
-            <span class="icon">🚀</span><span class="label">Fleet Carriers</span>
+            <span class="icon">ðŸš€</span><span class="label">Fleet Carriers</span>
         </div>
     </div>
-    <div class="nav-section">
-        <div class="nav-section-title">Integration</div>
+    
         <div class="nav-item" onclick="showPage(event, 'inara')">
-            <span class="icon">🔗</span><span class="label">Inara.cz</span>
+            <span class="icon">ðŸ”—</span><span class="label">Inara.cz</span>
         </div>
     </div>
-    <div class="nav-section">
-        <div class="nav-section-title">Commander</div>
-        <div class="nav-item" onclick="showPage(event, 'commander')">
-            <span class="icon">👤</span><span class="label">Dashboard</span>
-        </div>
-        <div class="nav-item" onclick="showPage(event, 'colonies')">
-            <span class="icon">🏰</span><span class="label">My Colonies</span>
-        </div>
-        <div class="nav-item" onclick="showPage(event, 'ships')">
-            <span class="icon">🚀</span><span class="label">Ship Hangar</span>
-        </div>
-        <div class="nav-item" onclick="showPage(event, 'materials')">
-            <span class="icon">📦</span><span class="label">Materials</span>
-        </div>
-        <div class="nav-item" onclick="showPage(event, 'bookmarks')">
-            <span class="icon">⭐</span><span class="label">Bookmarks</span>
-        </div>
-    </div>
+    
 </nav>
 
 <!-- MAIN CONTENT -->
@@ -777,7 +759,7 @@ HTML_TEMPLATE = """
 <!-- TRADE SEARCH PAGE -->
 <div id="page-trade" class="page active">
     <div class="page-header">
-        <h2>🔍 Trade Search</h2>
+        <h2>ðŸ” Trade Search</h2>
         <p>Search for commodities and find the best stations to buy or sell</p>
     </div>
     <div class="card">
@@ -807,7 +789,7 @@ HTML_TEMPLATE = """
 <!-- STATION INFO PAGE -->
 <div id="page-station" class="page">
     <div class="page-header">
-        <h2>🏢 Station Info</h2>
+        <h2>ðŸ¢ Station Info</h2>
         <p>Get detailed information about stations in a system</p>
     </div>
     <div class="card">
@@ -832,7 +814,7 @@ HTML_TEMPLATE = """
 <!-- TRADE ROUTES PAGE -->
 <div id="page-route" class="page">
     <div class="page-header">
-        <h2>📍 Trade Routes</h2>
+        <h2>ðŸ“ Trade Routes</h2>
         <p>Calculate distance and find stations between two systems</p>
     </div>
     <div class="card">
@@ -864,7 +846,7 @@ HTML_TEMPLATE = """
 <!-- SERVICE FINDER PAGE -->
 <div id="page-services" class="page">
     <div class="page-header">
-        <h2>🔧 Service Finder</h2>
+        <h2>ðŸ”§ Service Finder</h2>
         <p>Find stations with specific services near a system</p>
     </div>
     <div class="card">
@@ -904,7 +886,7 @@ HTML_TEMPLATE = """
 <!-- SYSTEM STATES PAGE -->
 <div id="page-states" class="page">
     <div class="page-header">
-        <h2>📊 System State Tracker</h2>
+        <h2>ðŸ“Š System State Tracker</h2>
         <p>Check system states and their effects on trade</p>
     </div>
     <div class="card">
@@ -944,7 +926,7 @@ HTML_TEMPLATE = """
 <!-- ENGINEERING PAGE -->
 <div id="page-engineering" class="page">
     <div class="page-header">
-        <h2>⚙️ Engineering Calculator</h2>
+        <h2>âš™ï¸ Engineering Calculator</h2>
         <p>Calculate material requirements for engineering blueprints</p>
     </div>
     <div class="card">
@@ -983,7 +965,7 @@ HTML_TEMPLATE = """
 <!-- COLONY ADVISOR PAGE -->
 <div id="page-colonize" class="page">
     <div class="page-header">
-        <h2>🏗️ Colony Advisor</h2>
+        <h2>ðŸ—ï¸ Colony Advisor</h2>
         <p>Plan your colony with the tech tree builder</p>
     </div>
     <div class="card">
@@ -1015,7 +997,7 @@ HTML_TEMPLATE = """
 <!-- GUARDIAN SITES PAGE -->
 <div id="page-guardian" class="page">
     <div class="page-header">
-        <h2>👽 Guardian Sites</h2>
+        <h2>ðŸ‘½ Guardian Sites</h2>
         <p>Known Guardian structures and ruins locations</p>
     </div>
     <div class="card">
@@ -1037,7 +1019,7 @@ HTML_TEMPLATE = """
 <!-- THARGOID SITES PAGE -->
 <div id="page-thargoid" class="page">
     <div class="page-header">
-        <h2>🛸 Thargoid Sites</h2>
+        <h2>ðŸ›¸ Thargoid Sites</h2>
         <p>Known Thargoid structures and crash sites</p>
     </div>
     <div class="card">
@@ -1059,7 +1041,7 @@ HTML_TEMPLATE = """
 <!-- FLEET CARRIER PAGE -->
 <div id="page-carrier" class="page">
     <div class="page-header">
-        <h2>🚀 Fleet Carrier Support</h2>
+        <h2>ðŸš€ Fleet Carrier Support</h2>
         <p>Search for fleet carriers and their services</p>
     </div>
     <div class="card">
@@ -1092,455 +1074,17 @@ HTML_TEMPLATE = """
     </div>
 </div>
 
-<!-- INARA PAGE -->
-<div id="page-inara" class="page">
-    <div class="page-header">
-        <h2>🔗 Inara.cz Integration</h2>
-        <p>Connect your Inara.cz account for personalized data</p>
-    </div>
-    <div class="card">
-        <div class="card-header"><span class="card-title">API Configuration</span></div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="inara-key">Inara API Key</label>
-                <input type="password" id="inara-key" placeholder="Your Inara API key">
-            </div>
-            <div class="form-group" style="display:flex;align-items:flex-end;">
-                <button onclick="saveInaraKey()">💾 Save Key</button>
-            </div>
-        </div>
-        <p style="color:var(--text-dim);font-size:0.8em;margin-top:10px;">
-            Get your API key from <span style="color:var(--cyan);">inara.cz</span> → Settings → API Key
-        </p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Sync Commander Data</span></div>
-        <div style="margin-bottom:15px;">
-            <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Fetch your commander profile, ranks, ships, and materials directly from Inara.cz. Make sure your CMDR name matches exactly.</p>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="inara-cmdr">CMDR Name</label>
-                    <input type="text" id="inara-cmdr" placeholder="CMDR Name (must match Inara)">
-                </div>
-                <div class="form-group" style="display:flex;align-items:flex-end;">
-                    <button onclick="syncInara()">🔄 Sync from Inara</button>
-                </div>
-            </div>
-        </div>
-        <div id="inara-sync-status" class="results-grid" style="display:none;"></div>
-    </div>
-    
-    <div id="inara-profile" class="card" style="display:none;">
-        <div class="card-header">
-            <span class="card-title">Synced Commander Data</span>
-            <button class="secondary" onclick="applyToDashboard()">📥 Import to Dashboard</button>
-        </div>
-        <div id="inara-data"></div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">What Gets Imported</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;">
-            <span class="service-badge green">✅ Commander Name</span>
-            <span class="service-badge green">✅ Combat Rank</span>
-            <span class="service-badge green">✅ Trade Rank</span>
-            <span class="service-badge green">✅ Exploration Rank</span>
-            <span class="service-badge green">✅ Credits</span>
-            <span class="service-badge green">✅ Material Inventory</span>
-            <span class="service-badge orange">⚠️ Ship Loadouts (partial)</span>
-            <span class="service-badge orange">⚠️ Community Goals</span>
-            <span class="service-badge orange">⚠️ Reputation (partial)</span>
-        </div>
-        <p style="color:var(--text-dim);font-size:0.85em;">
-            Data is fetched directly from Inara's servers. Some fields may not be available depending on your Inara privacy settings.
-        </p>
-    </div>
-</div>
-
-<!-- COMMANDER DASHBOARD PAGE -->
-<div id="page-commander" class="page">
-    <div class="page-header">
-        <h2>👤 Commander Dashboard</h2>
-        <p>Your Elite Dangerous command center</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Commander Profile</span></div>
-        <div class="form-grid" style="margin-bottom:15px;">
-            <div class="form-group">
-                <label for="cmdr-name">Commander Name (CMDR)</label>
-                <input type="text" id="cmdr-name" placeholder="Your CMDR name">
-            </div>
-            <div class="form-group">
-                <label for="cmdr-ship">Current Ship</label>
-                <input type="text" id="cmdr-ship" placeholder="e.g. Anaconda, Corvette">
-            </div>
-            <div class="form-group">
-                <label for="cmdr-home">Home System</label>
-                <input type="text" id="cmdr-home" placeholder="e.g. Sol, Diaguandi">
-            </div>
-            <div class="form-group">
-                <label for="cmdr-location">Current Location</label>
-                <input type="text" id="cmdr-location" placeholder="Current system">
-            </div>
-        </div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="cmdr-credits">Credits (CR)</label>
-                <input type="text" id="cmdr-credits" placeholder="e.g. 1,500,000,000">
-            </div>
-            <div class="form-group">
-                <label for="cmdr-ranks">Ranks (Combat/Trade/Explore)</label>
-                <input type="text" id="cmdr-ranks" placeholder="e.g. Expert/Master/Elite">
-            </div>
-        </div>
-        <button onclick="saveCommander()">Save Profile</button>
-    </div>
-    
-    <div id="cmdr-display" class="card" style="display:none;">
-        <div class="stat-grid">
-            <div class="stat-box">
-                <div class="value" id="disp-name">-</div>
-                <div class="label">Commander</div>
-            </div>
-            <div class="stat-box">
-                <div class="value" id="disp-ship">-</div>
-                <div class="label">Current Ship</div>
-            </div>
-            <div class="stat-box">
-                <div class="value" id="disp-location">-</div>
-                <div class="label">Location</div>
-            </div>
-            <div class="stat-box">
-                <div class="value" id="disp-credits">-</div>
-                <div class="label">Credits</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Quick Actions</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <button class="secondary" onclick="quickAction('plot-home')">📍 Plot Route Home</button>
-            <button class="secondary" onclick="quickAction('nearest-station')">🏢 Nearest Station</button>
-            <button class="secondary" onclick="quickAction('nearest-fuel')">⛽ Nearest Fuel</button>
-            <button class="secondary" onclick="quickAction('nearest-repair')">🔧 Nearest Repair</button>
-            <button class="secondary" onclick="quickAction('nearest-material-trader')">🔄 Material Trader</button>
-            <button class="secondary" onclick="quickAction('nearest-tech-broker')">⚙️ Tech Broker</button>
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Data Backup & Restore</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <button class="secondary" onclick="exportData()">📤 Export All Data</button>
-            <button class="secondary" onclick="document.getElementById('import-file').click()">📥 Import Data</button>
-            <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)" aria-label="Import data from JSON file">
-            <button class="secondary" onclick="clearAllData()" style="border-color:var(--red);color:var(--red);">🗑️ Clear All</button>
-        </div>
-        <p style="color:var(--text-dim);font-size:0.8em;margin-top:10px;">
-            Export your commander profile, colonies, ships, materials, and bookmarks to a JSON file. Keep it safe — this is your progress backup.
-        </p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Recent Activity</span></div>
-        <div id="activity-log" class="results-grid">
-            <p style="color:var(--text-dim);font-size:0.85em;">No recent activity. Start exploring!</p>
-        </div>
-    </div>
-</div>
-
-<!-- MY COLONIES PAGE -->
-<div id="page-colonies" class="page">
-    <div class="page-header">
-        <h2>🏰 My Colonies</h2>
-        <p>Track your colonized systems and facility progress</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Add Colonized System</span></div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="colony-add-system">System Name</label>
-                <input type="text" id="colony-add-system" placeholder="e.g. Beta Hydri">
-            </div>
-            <div class="form-group">
-                <label for="colony-add-station">Station Name</label>
-                <input type="text" id="colony-add-station" placeholder="e.g. Markov Station">
-            </div>
-            <div class="form-group">
-                <label for="colony-type">Station Type</label>
-                <select id="colony-type">
-                    <option value="Orbital Station">Orbital Station</option>
-                    <option value=" planetary Outpost">Planetary Outpost</option>
-                    <option value="Planetary Port">Planetary Port</option>
-                    <option value="Fleet Carrier">Fleet Carrier</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="addColony()">Add Colony</button>
-    </div>
-    
-    <div id="colonies-list" class="card">
-        <div class="card-header"><span class="card-title">Your Colonies</span></div>
-        <div id="colonies-results" class="results-grid"></div>
-    </div>
-    
-    <div id="colony-detail" class="card" style="display:none;">
-        <div class="card-header">
-            <span class="card-title" id="colony-detail-name">Colony Name</span>
-            <button class="secondary" onclick="closeColonyDetail()">← Back</button>
-        </div>
-        
-        <div class="form-grid" style="margin-bottom:15px;">
-            <div class="form-group">
-                <label for="colony-facilities">Built Facilities</label>
-                <div id="colony-facilities" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
-            </div>
-        </div>
-        
-        <h4 style="color:var(--cyan);margin:15px 0 10px;">Add Facility</h4>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="add-facility">Facility Type</label>
-                <select id="add-facility">
-                    <option value="High Tech Hub">High Tech Hub</option>
-                    <option value="Industrial Hub">Industrial Hub</option>
-                    <option value="Mining Hub">Mining Hub</option>
-                    <option value="Refinery Hub">Refinery Hub</option>
-                    <option value="Trading Hub">Trading Hub</option>
-                    <option value="Exploration Hub">Exploration Hub</option>
-                    <option value="Military Installation">Military Installation</option>
-                    <option value="Terraforming Hub">Terraforming Hub</option>
-                    <option value="Research Lab">Research Lab</option>
-                    <option value="Shipyard Hub">Shipyard Hub</option>
-                    <option value="Farm Complex">Farm Complex</option>
-                    <option value="Power Plant">Power Plant</option>
-                    <option value="Water Treatment">Water Treatment</option>
-                    <option value="Communications Array">Communications Array</option>
-                    <option value="Mission Board">Mission Board</option>
-                    <option value="Barracks">Barracks</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="addFacility()">Add Facility</button>
-        
-        <h4 style="color:var(--cyan);margin:15px 0 10px;">Colony Stats</h4>
-        <div id="colony-stats" class="stat-grid"></div>
-    </div>
-</div>
-
-<!-- SHIP HANGAR PAGE -->
-<div id="page-ships" class="page">
-    <div class="page-header">
-        <h2>🚀 Ship Hangar</h2>
-        <p>Track your ships and their loadouts</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Add Ship</span></div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="ship-name">Ship Type</label>
-                <input type="text" id="ship-name" placeholder="e.g. Anaconda, Python, Krait Phantom">
-            </div>
-            <div class="form-group">
-                <label for="ship-role">Role</label>
-                <select id="ship-role">
-                    <option value="Combat">Combat</option>
-                    <option value="Trading">Trading</option>
-                    <option value="Exploration">Exploration</option>
-                    <option value="Mining">Mining</option>
-                    <option value="Passenger">Passenger</option>
-                    <option value="Mission Running">Mission Running</option>
-                    <option value="PvP">PvP</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="ship-build">Build Status</label>
-                <select id="ship-build">
-                    <option value="Stock">Stock</option>
-                    <option value="Partial">Partial Engineering</option>
-                    <option value="Full">Fully Engineered</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="addShip()">Add Ship</button>
-    </div>
-    
-    <div id="ships-list" class="card">
-        <div class="card-header"><span class="card-title">Your Ships</span></div>
-        <div id="ships-results" class="results-grid"></div>
-    </div>
-</div>
-
-<!-- MATERIALS PAGE -->
-<div id="page-materials" class="page">
-    <div class="page-header">
-        <h2>📦 Material Inventory</h2>
-        <p>Track your engineering materials and synthesis needs</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Add Material</span></div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="mat-name">Material Name</label>
-                <input type="text" id="mat-name" placeholder="e.g. Phosphorus, Encoded, Micro Controllers">
-            </div>
-            <div class="form-group">
-                <label for="mat-type">Type</label>
-                <select id="mat-type">
-                    <option value="Raw">Raw</option>
-                    <option value="Encoded">Encoded</option>
-                    <option value="Manufactured">Manufactured</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="mat-qty">Quantity</label>
-                <input type="number" id="mat-qty" placeholder="e.g. 27" value="1">
-            </div>
-            <div class="form-group">
-                <label for="mat-grade">Grade (1-5)</label>
-                <select id="mat-grade">
-                    <option value="1">Grade 1</option>
-                    <option value="2">Grade 2</option>
-                    <option value="3">Grade 3</option>
-                    <option value="4">Grade 4</option>
-                    <option value="5">Grade 5</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="addMaterial()">Add Material</button>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Material Categories</span></div>
-        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-            <button class="secondary" onclick="filterMaterials('all')">All</button>
-            <button class="secondary" onclick="filterMaterials('Raw')">Raw</button>
-            <button class="secondary" onclick="filterMaterials('Encoded')">Encoded</button>
-            <button class="secondary" onclick="filterMaterials('Manufactured')">Manufactured</button>
-        </div>
-        <div id="materials-results" class="results-grid"></div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Shopping List</span></div>
-        <p style="color:var(--text-dim);font-size:0.85em;margin-bottom:10px;">Materials you need to gather for your next engineering goal</p>
-        <div id="shopping-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-        <div style="margin-top:10px;">
-            <label for="shopping-mat" style="display:none;">Add material</label>
-            <input type="text" id="shopping-mat" placeholder="Add to shopping list..." style="max-width:200px;">
-            <button class="secondary" onclick="addToShopping()">Add</button>
-        </div>
-    </div>
-</div>
-
-<!-- BOOKMARKS PAGE -->
-<div id="page-bookmarks" class="page">
-    <div class="page-header">
-        <h2>⭐ Bookmarks</h2>
-        <p>Save your favorite systems, stations, and routes</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Add Bookmark</span></div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="bm-type">Type</label>
-                <select id="bm-type">
-                    <option value="System">System</option>
-                    <option value="Station">Station</option>
-                    <option value="Route">Route</option>
-                    <option value="POI">Point of Interest</option>
-                    <option value="Mining">Mining Spot</option>
-                    <option value="Combat">Combat Zone</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="bm-name">Name</label>
-                <input type="text" id="bm-name" placeholder="Bookmark name">
-            </div>
-            <div class="form-group">
-                <label for="bm-location">Location / System</label>
-                <input type="text" id="bm-location" placeholder="e.g. Core Dynamics, Sol">
-            </div>
-            <div class="form-group">
-                <label for="bm-notes">Notes</label>
-                <input type="text" id="bm-notes" placeholder="Optional notes">
-            </div>
-        </div>
-        <button onclick="addBookmark()">Add Bookmark</button>
-    </div>
-    
-    <div class="card">
-        <div class="card-header"><span class="card-title">Your Bookmarks</span></div>
-        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-            <button class="secondary" onclick="filterBookmarks('all')">All</button>
-            <button class="secondary" onclick="filterBookmarks('System')">Systems</button>
-            <button class="secondary" onclick="filterBookmarks('Station')">Stations</button>
-            <button class="secondary" onclick="filterBookmarks('Mining')">Mining</button>
-            <button class="secondary" onclick="filterBookmarks('POI')">POIs</button>
-        </div>
-        <div id="bookmarks-results" class="results-grid"></div>
-    </div>
-</div>
-
-</main>
-
-<!-- STATION DETAIL MODAL -->
-<div id="station-modal" class="modal-overlay">
+id="station-modal" class="modal-overlay">
     <div class="modal">
         <div class="modal-header">
             <h3 id="modal-station-name">Station Name</h3>
-            <button class="modal-close" onclick="closeModal()">×</button>
+            <button class="modal-close" onclick="closeModal()">Ã—</button>
         </div>
         <div class="modal-body">
             <div class="stat-grid" style="margin-bottom:20px;">
                 <div class="stat-box">
                     <div class="value" id="modal-station-type">-</div>
                     <div class="label">Type</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="modal-station-distance">-</div>
-                    <div class="label">Distance (LS)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="modal-station-economy">-</div>
-                    <div class="label">Economy</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="modal-station-government">-</div>
-                    <div class="label">Government</div>
-                </div>
-            </div>
-            
-            <div class="modal-section">
-                <h4>🚉 Services</h4>
-                <div id="modal-services"></div>
-            </div>
-            
-            <div class="modal-tabs">
-                <button class="modal-tab active" onclick="showModalTab('market')">Market</button>
-                <button class="modal-tab" onclick="showModalTab('outfitting')">Outfitting</button>
-                <button class="modal-tab" onclick="showModalTab('shipyard')">Shipyard</button>
-            </div>
-            
-            <div id="modal-tab-market" class="tab-content active">
-                <div id="modal-market-list"></div>
-            </div>
-            <div id="modal-tab-outfitting" class="tab-content">
-                <div id="modal-outfitting-list"></div>
-            </div>
-            <div id="modal-tab-shipyard" class="tab-content">
-                <div id="modal-shipyard-list"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 // Navigation
@@ -1582,7 +1126,7 @@ async function searchTrade() {
             <div class="result-item" onclick="openStationModal('${data.system}', '${r.station}')">
                 <div class="station-name">${r.station}</div>
                 <div class="station-info">
-                    ${r.type} • ${r.distance} LS from star<br>
+                    ${r.type} â€¢ ${r.distance} LS from star<br>
                     Buy: <span class="price-buy">${r.buy.toLocaleString()}</span> CR | 
                     Sell: <span class="price-sell">${r.sell.toLocaleString()}</span> CR<br>
                     Stock: ${r.stock.toLocaleString()} | Demand: ${r.demand.toLocaleString()}
@@ -1623,8 +1167,8 @@ async function searchStation() {
             <div class="result-item" onclick="openStationModal('${data.system}', '${s.name}')">
                 <div class="station-name">${s.name}</div>
                 <div class="station-info">
-                    ${s.type || 'Unknown'} • ${s.distanceToArrival || '?'} LS<br>
-                    Economy: ${s.economy || 'Unknown'} • ${s.government || ''}<br>
+                    ${s.type || 'Unknown'} â€¢ ${s.distanceToArrival || '?'} LS<br>
+                    Economy: ${s.economy || 'Unknown'} â€¢ ${s.government || ''}<br>
                     ${formatServices(s)}
                 </div>
             </div>
@@ -1753,7 +1297,7 @@ async function searchRoute() {
                 <div class="result-item">
                     <div class="station-name">${s.name}</div>
                     <div class="station-info">
-                        ${s.type} • ${s.economy} • ${s.government || ''}<br>
+                        ${s.type} â€¢ ${s.economy} â€¢ ${s.government || ''}<br>
                         Market: ${s.haveMarket ? '<span class="service-badge green">Yes</span>' : '<span class="service-badge">No</span>'}
                         Shipyard: ${s.haveShipyard ? '<span class="service-badge green">Yes</span>' : '<span class="service-badge">No</span>'}
                     </div>
@@ -1797,7 +1341,7 @@ async function searchServices() {
             <div class="result-item" onclick="openStationModal('${data.system}', '${s.name}')">
                 <div class="station-name">${s.name}</div>
                 <div class="station-info">
-                    ${s.type} • ${s.distance} LS from star<br>
+                    ${s.type} â€¢ ${s.distance} LS from star<br>
                     ${s.services.map(sv => `<span class="service-badge ${getServiceClass(sv)}">${sv}</span>`).join('')}
                 </div>
             </div>
@@ -1949,9 +1493,9 @@ async function planColony() {
         
         document.getElementById('colony-suggestions').innerHTML = data.suggestions.map(f => `
             <div class="result-item ${f.locked ? 'locked' : ''}" style="${f.locked ? 'opacity:0.5' : ''}">
-                <div class="station-name">${f.name} ${f.locked ? '🔒' : ''}</div>
+                <div class="station-name">${f.name} ${f.locked ? 'ðŸ”’' : ''}</div>
                 <div class="station-info">
-                    Tier ${f.tier} • ${f.requires.length > 0 ? 'Requires: ' + f.requires.join(', ') : 'No requirements'}<br>
+                    Tier ${f.tier} â€¢ ${f.requires.length > 0 ? 'Requires: ' + f.requires.join(', ') : 'No requirements'}<br>
                     ${Object.entries(f.gives).map(([k, v]) => `<span class="stat-change stat-positive">+${v} ${k}</span>`).join(' ')}
                     <br><br>
                     <strong>Cost:</strong> ${Object.entries(f.cost).map(([k, v]) => `<span class="cost-item">${k}: ${v}</span>`).join(' ')}
@@ -1979,7 +1523,7 @@ function loadGuardianSites() {
         <div class="result-item">
             <div class="station-name">${s.name}</div>
             <div class="station-info">
-                <span class="service-badge orange">${s.type}</span> • ${s.region}
+                <span class="service-badge orange">${s.type}</span> â€¢ ${s.region}
             </div>
         </div>
     `).join('');
@@ -2001,7 +1545,7 @@ function loadThargoidSites() {
         <div class="result-item">
             <div class="station-name">${s.name}</div>
             <div class="station-info">
-                <span class="service-badge red">${s.type}</span> • ${s.region}
+                <span class="service-badge red">${s.type}</span> â€¢ ${s.region}
             </div>
         </div>
     `).join('');
@@ -2040,27 +1584,8 @@ async function searchCarrier() {
 }
 
 // Inara
-function saveInaraKey() {
-    const key = document.getElementById('inara-key').value;
-    localStorage.setItem('inara_api_key', key);
-    alert('API key saved! Some features require Inara account linking.');
-}
 
 // ===== COMMANDER DASHBOARD =====
-function saveCommander() {
-    const cmdr = {
-        name: document.getElementById('cmdr-name').value,
-        ship: document.getElementById('cmdr-ship').value,
-        home: document.getElementById('cmdr-home').value,
-        location: document.getElementById('cmdr-location').value,
-        credits: document.getElementById('cmdr-credits').value,
-        ranks: document.getElementById('cmdr-ranks').value
-    };
-    localStorage.setItem('elite_cmdr', JSON.stringify(cmdr));
-    displayCommander();
-    logActivity('Profile updated');
-    alert('Commander profile saved!');
-}
 
 function displayCommander() {
     const stored = localStorage.getItem('elite_cmdr');
@@ -2102,7 +1627,7 @@ function renderActivity() {
     }
     container.innerHTML = log.map(e => `
         <div class="result-item">
-            <div class="station-info">${e.time} — ${e.action}</div>
+            <div class="station-info">${e.time} â€” ${e.action}</div>
         </div>
     `).join('');
 }
@@ -2116,7 +1641,7 @@ function quickAction(action) {
     switch(action) {
         case 'plot-home':
             msg = `Plot route from ${location} to ${home}`;
-            logActivity(`Route: ${location} → ${home}`);
+            logActivity(`Route: ${location} â†’ ${home}`);
             break;
         case 'nearest-station':
             msg = `Finding nearest station to ${location}...`;
@@ -2147,55 +1672,7 @@ function quickAction(action) {
 }
 
 // ===== COLONIES =====
-function addColony() {
-    const system = document.getElementById('colony-add-system').value;
-    const station = document.getElementById('colony-add-station').value;
-    const type = document.getElementById('colony-type').value;
-    
-    if (!system) { alert('Please enter system name'); return; }
-    
-    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
-    // Check if already exists
-    if (colonies.some(c => c.system === system)) {
-        alert('System already in colonies list');
-        return;
-    }
-    
-    colonies.push({
-        system, station: station || 'Unknown', 
-        type, facilities: [],
-        stats: { tech_level: 1, wealth: 0, population: 0, security: 10, sol: 10 },
-        created: new Date().toLocaleString()
-    });
-    
-    localStorage.setItem('elite_colonies', JSON.stringify(colonies));
-    document.getElementById('colony-add-system').value = '';
-    document.getElementById('colony-add-station').value = '';
-    renderColonies();
-    logActivity(`Colony added: ${system}`);
-    alert('Colony added!');
-}
 
-function renderColonies() {
-    const colonies = JSON.parse(localStorage.getItem('elite_colonies') || '[]');
-    const container = document.getElementById('colonies-results');
-    
-    if (colonies.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-dim);">No colonies yet. Add your first colonized system!</p>';
-        return;
-    }
-    
-    container.innerHTML = colonies.map((c, i) => `
-        <div class="result-item" onclick="openColonyDetail(${i})">
-            <div class="station-name">${c.system}</div>
-            <div class="station-info">
-                ${c.station} (${c.type})<br>
-                Facilities: ${c.facilities.length} | Created: ${c.created}<br>
-                ${c.facilities.map(f => '<span class="service-badge green">' + f + '</span>').join(' ')}
-            </div>
-        </div>
-    `).join('');
-}
 
 let currentColonyIndex = -1;
 
@@ -2273,68 +1750,9 @@ function addFacility() {
 }
 
 // ===== SHIPS =====
-function addShip() {
-    const name = document.getElementById('ship-name').value;
-    const role = document.getElementById('ship-role').value;
-    const build = document.getElementById('ship-build').value;
-    
-    if (!name) { alert('Please enter ship name'); return; }
-    
-    const ships = JSON.parse(localStorage.getItem('elite_ships') || '[]');
-    ships.push({ name, role, build, modules: [], created: new Date().toLocaleString() });
-    localStorage.setItem('elite_ships', JSON.stringify(ships));
-    document.getElementById('ship-name').value = '';
-    renderShips();
-    logActivity(`Ship added: ${name}`);
-    alert('Ship added!');
-}
 
-function renderShips() {
-    const ships = JSON.parse(localStorage.getItem('elite_ships') || '[]');
-    const container = document.getElementById('ships-results');
-    
-    if (ships.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-dim);">No ships in hangar. Add your first ship!</p>';
-        return;
-    }
-    
-    const roleColors = { Combat: 'red', Trading: 'green', Exploration: 'cyan', Mining: 'orange', Passenger: 'purple', 'Mission Running': 'yellow', PvP: 'red' };
-    
-    container.innerHTML = ships.map((s, i) => `
-        <div class="result-item">
-            <div class="station-name">${s.name}</div>
-            <div class="station-info">
-                <span class="service-badge" style="background:rgba(${roleColors[s.role]==='red'?'255,71,87':roleColors[s.role]==='green'?'0,255,136':roleColors[s.role]==='cyan'?'0,212,255':roleColors[s.role]==='orange'?'255,165,0':roleColors[s.role]==='purple'?'165,94,234':'255,165,0'},0.2);color:var(--${roleColors[s.role]==='red'?'red':roleColors[s.role]==='green'?'green':roleColors[s.role]==='cyan'?'cyan':roleColors[s.role]==='orange'?'orange':roleColors[s.role]==='purple'?'purple':'orange'})">${s.role}</span>
-                <span class="service-badge ${s.build === 'Full' ? 'green' : s.build === 'Partial' ? 'orange' : ''}">${s.build}</span>
-                <br>Added: ${s.created}
-            </div>
-        </div>
-    `).join('');
-}
 
 // ===== MATERIALS =====
-function addMaterial() {
-    const name = document.getElementById('mat-name').value;
-    const type = document.getElementById('mat-type').value;
-    const qty = parseInt(document.getElementById('mat-qty').value) || 1;
-    const grade = parseInt(document.getElementById('mat-grade').value) || 1;
-    
-    if (!name) { alert('Please enter material name'); return; }
-    
-    const materials = JSON.parse(localStorage.getItem('elite_materials') || '[]');
-    const existing = materials.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
-    if (existing >= 0) {
-        materials[existing].qty += qty;
-    } else {
-        materials.push({ name, type, qty, grade });
-    }
-    
-    localStorage.setItem('elite_materials', JSON.stringify(materials));
-    document.getElementById('mat-name').value = '';
-    document.getElementById('mat-qty').value = '1';
-    renderMaterials('all');
-    logActivity(`Material: ${name} x${qty}`);
-}
 
 let currentMatFilter = 'all';
 
@@ -2343,28 +1761,6 @@ function filterMaterials(type) {
     renderMaterials(type);
 }
 
-function renderMaterials(type) {
-    const materials = JSON.parse(localStorage.getItem('elite_materials') || '[]');
-    const container = document.getElementById('materials-results');
-    const filtered = type === 'all' ? materials : materials.filter(m => m.type === type);
-    
-    if (filtered.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-dim);">No materials in inventory</p>';
-        return;
-    }
-    
-    const typeColors = { Raw: 'green', Encoded: 'cyan', Manufactured: 'orange' };
-    
-    container.innerHTML = filtered.sort((a, b) => a.name.localeCompare(b.name)).map(m => `
-        <div class="result-item">
-            <div class="station-name">${m.name}</div>
-            <div class="station-info">
-                <span class="material-chip ${m.type.toLowerCase()}">${m.type}</span>
-                Grade ${m.grade} | Qty: ${m.qty}
-            </div>
-        </div>
-    `).join('');
-}
 
 function addToShopping() {
     const mat = document.getElementById('shopping-mat').value;
@@ -2388,7 +1784,7 @@ function renderShoppingList() {
         return;
     }
     
-    container.innerHTML = list.map((m, i) => `<span class="material-chip" onclick="removeShopping(${i})" style="cursor:pointer;" title="Click to remove">${m} ×</span>`).join('');
+    container.innerHTML = list.map((m, i) => `<span class="material-chip" onclick="removeShopping(${i})" style="cursor:pointer;" title="Click to remove">${m} Ã—</span>`).join('');
 }
 
 function removeShopping(index) {
@@ -2399,24 +1795,6 @@ function removeShopping(index) {
 }
 
 // ===== BOOKMARKS =====
-function addBookmark() {
-    const type = document.getElementById('bm-type').value;
-    const name = document.getElementById('bm-name').value;
-    const location = document.getElementById('bm-location').value;
-    const notes = document.getElementById('bm-notes').value;
-    
-    if (!name) { alert('Please enter a name'); return; }
-    
-    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
-    bookmarks.push({ type, name, location: location || '', notes: notes || '', created: new Date().toLocaleString() });
-    localStorage.setItem('elite_bookmarks', JSON.stringify(bookmarks));
-    document.getElementById('bm-name').value = '';
-    document.getElementById('bm-location').value = '';
-    document.getElementById('bm-notes').value = '';
-    renderBookmarks('all');
-    logActivity(`Bookmark added: ${name}`);
-    alert('Bookmark added!');
-}
 
 let currentBmFilter = 'all';
 
@@ -2425,207 +1803,15 @@ function filterBookmarks(type) {
     renderBookmarks(type);
 }
 
-function renderBookmarks(type) {
-    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
-    const container = document.getElementById('bookmarks-results');
-    const filtered = type === 'all' ? bookmarks : bookmarks.filter(b => b.type === type);
-    
-    if (filtered.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-dim);">No bookmarks yet</p>';
-        return;
-    }
-    
-    const typeIcons = { System: '🌟', Station: '🏢', Route: '📍', POI: '📌', Mining: '⛏️', Combat: '⚔️' };
-    
-    container.innerHTML = filtered.map((b, i) => `
-        <div class="result-item">
-            <div class="station-name">${typeIcons[b.type] || '📍'} ${b.name}</div>
-            <div class="station-info">
-                <span class="service-badge">${b.type}</span> ${b.location ? '— ' + b.location : ''}<br>
-                ${b.notes ? 'Notes: ' + b.notes + '<br>' : ''}
-                <button class="secondary" onclick="deleteBookmark(${i})" style="padding:3px 8px;font-size:0.75em;margin-top:5px;">Delete</button>
-            </div>
-        </div>
-    `).join('');
-}
 
-function deleteBookmark(index) {
-    const bookmarks = JSON.parse(localStorage.getItem('elite_bookmarks') || '[]');
-    const name = bookmarks[index].name;
-    bookmarks.splice(index, 1);
-    localStorage.setItem('elite_bookmarks', JSON.stringify(bookmarks));
-    renderBookmarks(currentBmFilter);
-    logActivity(`Bookmark removed: ${name}`);
-}
 
 // ===== DATA EXPORT/IMPORT =====
-function exportData() {
-    const data = {
-        cmdr: JSON.parse(localStorage.getItem('elite_cmdr') || '{}'),
-        colonies: JSON.parse(localStorage.getItem('elite_colonies') || '[]'),
-        ships: JSON.parse(localStorage.getItem('elite_ships') || '[]'),
-        materials: JSON.parse(localStorage.getItem('elite_materials') || '[]'),
-        bookmarks: JSON.parse(localStorage.getItem('elite_bookmarks') || '[]'),
-        activity: JSON.parse(localStorage.getItem('elite_activity') || '[]'),
-        inara_api_key: localStorage.getItem('inara_api_key') || '',
-        exported: new Date().toISOString()
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `elite-companion-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    logActivity('Data exported to file');
-    alert('✅ Data exported! Save this file somewhere safe.');
-}
 
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            
-            // Validate
-            if (!data.exported) {
-                alert('Invalid backup file');
-                return;
-            }
-            
-            // Import
-            if (data.cmdr) localStorage.setItem('elite_cmdr', JSON.stringify(data.cmdr));
-            if (data.colonies) localStorage.setItem('elite_colonies', JSON.stringify(data.colonies));
-            if (data.ships) localStorage.setItem('elite_ships', JSON.stringify(data.ships));
-            if (data.materials) localStorage.setItem('elite_materials', JSON.stringify(data.materials));
-            if (data.bookmarks) localStorage.setItem('elite_bookmarks', JSON.stringify(data.bookmarks));
-            if (data.activity) localStorage.setItem('elite_activity', JSON.stringify(data.activity));
-            if (data.inara_api_key) localStorage.setItem('inara_api_key', data.inara_api_key);
-            
-            // Refresh UI
-            displayCommander();
-            renderColonies();
-            renderShips();
-            renderMaterials('all');
-            renderShoppingList();
-            renderBookmarks('all');
-            renderActivity();
-            
-            logActivity('Data imported from file');
-            alert(`✅ Data imported from ${data.exported.split('T')[0]}!`);
-        } catch (err) {
-            alert('❌ Failed to import: ' + err.message);
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-}
 
-function clearAllData() {
-    if (!confirm('⚠️ WARNING: This will DELETE all your commander data, colonies, ships, materials, and bookmarks. This cannot be undone.\n\nAre you sure?')) return;
-    
-    const keys = ['elite_cmdr', 'elite_colonies', 'elite_ships', 'elite_materials', 'elite_bookmarks', 'elite_activity', 'elite_shopping', 'inara_api_key'];
-    keys.forEach(k => localStorage.removeItem(k));
-    
-    // Refresh UI
-    displayCommander();
-    renderColonies();
-    renderShips();
-    renderMaterials('all');
-    renderShoppingList();
-    renderBookmarks('all');
-    renderActivity();
-    
-    alert('🗑️ All data cleared. Export next time before clearing!');
-    logActivity('All data cleared');
-}
 
 // ===== INARA API INTEGRATION ===== [v11-fix]
 let inaraSyncedData = null;
 
-async function syncInara() {
-    const apiKey = localStorage.getItem('inara_api_key');
-    if (!apiKey) {
-        alert('Please save your Inara API key first');
-        return;
-    }
-    
-    const cmdrName = document.getElementById('inara-cmdr').value;
-    if (!cmdrName) {
-        alert('Please enter your CMDR name');
-        return;
-    }
-    
-    const status = document.getElementById('inara-sync-status');
-    status.style.display = 'block';
-    status.innerHTML = '<div class="loading">Fetching from Inara.cz</div>';
-    
-    try {
-        const response = await fetch('/api/inara_profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ apiKey, cmdrName })
-        });
-        const data = await response.json();
-        
-        if (data.error) {
-            status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Error: ${data.error}</div></div>`;
-            return;
-        }
-        
-        // Parse Inara response
-        const events = data.events || [];
-        if (events.length === 0 || events[0].eventStatus === 'error') {
-            status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Inara API error: ${events[0]?.eventStatusText || 'Unknown error'}</div></div>`;
-            return;
-        }
-        
-        const eventData = events[0].eventData || {};
-        inaraSyncedData = {
-            name: eventData.userName || cmdrName,
-            credits: eventData.credits || 0,
-            combatRank: eventData.combatRank || '?',
-            tradeRank: eventData.tradeRank || '?',
-            exploreRank: eventData.exploreRank || '?',
-            shipName: eventData.shipName || '?',
-            shipIdent: eventData.shipIdent || '',
-            materials: eventData.materials || [],
-            systemsVisited: eventData.systemsVisited || 0
-        };
-        
-        // Show success + data
-        status.innerHTML = `<div class="result-item" style="border-left-color:var(--green)">
-            <div class="station-info">✅ Sync successful! Found: ${inaraSyncedData.name}</div>
-        </div>`;
-        
-        // Show profile card
-        document.getElementById('inara-profile').style.display = 'block';
-        document.getElementById('inara-data').innerHTML = `
-            <div class="stat-grid" style="margin-bottom:15px;">
-                <div class="stat-box"><div class="value">${inaraSyncedData.name}</div><div class="label">Commander</div></div>
-                <div class="stat-box"><div class="value">${inaraSyncedData.combatRank}</div><div class="label">Combat</div></div>
-                <div class="stat-box"><div class="value">${inaraSyncedData.tradeRank}</div><div class="label">Trade</div></div>
-                <div class="stat-box"><div class="value">${inaraSyncedData.exploreRank}</div><div class="label">Explore</div></div>
-                <div class="stat-box"><div class="value">${(inaraSyncedData.credits || 0).toLocaleString()}</div><div class="label">Credits (CR)</div></div>
-                <div class="stat-box"><div class="value">${inaraSyncedData.systemsVisited}</div><div class="label">Systems Visited</div></div>
-            </div>
-            <div class="station-info" style="margin-top:10px;">
-                <strong>Current Ship:</strong> ${inaraSyncedData.shipName || 'Unknown'}
-                ${inaraSyncedData.shipIdent ? ` (${inaraSyncedData.shipIdent})` : ''}
-            </div>
-        `;
-        
-        logActivity(`Synced with Inara: ${inaraSyncedData.name}`);
-        
-    } catch (e) {
-        status.innerHTML = `<div class="result-item" style="border-left-color:var(--red)"><div class="station-info">❌ Error: ${e.message}</div></div>`;
-        console.error('Inara sync error:', e);
-    }
-}
 
 function applyToDashboard() {
     if (!inaraSyncedData) {
@@ -2676,10 +1862,10 @@ function applyToDashboard() {
         localStorage.setItem('elite_materials', JSON.stringify(materials));
     }
     
-    renderShips();
+    
     renderMaterials('all');
     logActivity('Imported Inara data to Dashboard');
-    alert('✅ Commander data imported to Dashboard!');
+    alert('âœ… Commander data imported to Dashboard!');
 }
 
 // Initialize
@@ -2692,7 +1878,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved data
     displayCommander();
     renderColonies();
-    renderShips();
+    
     renderMaterials('all');
     renderShoppingList();
     renderBookmarks('all');
